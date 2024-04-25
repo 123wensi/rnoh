@@ -35,6 +35,8 @@ class TextInputComponentInstance
   bool m_valueChanged = false;
 
   bool m_focused{false};
+  void focus();
+  void blur();
 
  public:
   TextInputComponentInstance(Context context);

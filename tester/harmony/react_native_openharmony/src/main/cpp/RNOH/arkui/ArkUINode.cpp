@@ -392,6 +392,14 @@ void ArkUINode::onNodeEvent(
     ArkUI_NodeEventType eventType,
     std::string_view eventString) {}
 
+ArkUINode& ArkUINode::setFocusStatus(int32_t focus) {
+  std::array<ArkUI_NumberValue, 1> value = {{{.i32 = focus}}};
+  ArkUI_AttributeItem item = {value.data(), value.size()};
+  maybeThrow(NativeNodeApi::getInstance()->setAttribute(
+      m_nodeHandle, NODE_FOCUS_STATUS, &item));
+  return *this;
+}
+
 ArkUINode::~ArkUINode() {
   if (m_nodeHandle != nullptr) {
     ArkUINodeRegistry::getInstance().unregisterNode(this);

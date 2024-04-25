@@ -24,8 +24,6 @@ class TextInputNodeBase : public ArkUINode {
       facebook::react::Point const& position,
       facebook::react::Size const& size);
 
-  void setFocusStatus(int32_t focus);
-
   void setTextContent(std::string const& textContent);
 
   void setTextSelection(int32_t start, int32_t end);

@@ -331,12 +331,21 @@ export function TextInputTest() {
         itShould="trigger onKeyPress event after pressing backspace"
         initialState={''}
         arrange={({setState}) => (
-          <TextInputWithText
-            style={styles.textInput}
-            autoFocus
-            defaultValue="a"
-            onKeyPress={event => setState(event.nativeEvent.key)}
-          />
+          <>
+            <TextInputWithText
+              style={styles.textInput}
+              autoFocus
+              defaultValue="a"
+              onKeyPress={event => setState(event.nativeEvent.key)}
+            />
+            <TextInputWithText
+              style={styles.textInputBigger}
+              autoFocus
+              multiline
+              defaultValue="a"
+              onKeyPress={event => setState(event.nativeEvent.key)}
+            />
+          </>
         )}
         assert={({expect, state}) => {
           expect(state).to.be.eq('Backspace');
@@ -531,11 +540,13 @@ export function TextInputTest() {
         <TextSelectionChangeTest />
       </TestCase.Example>
       <TestCase.Example
+        tags={['C_API']}
         modal
         itShould="show textinput with 'Selection' substring selected">
         <SelectionTest />
       </TestCase.Example>
       <TestCase.Example
+        tags={['C_API']}
         modal
         itShould="show controlled textinput with 'Selection' substring selected">
         <ControlledSelectionTest />
@@ -545,11 +556,17 @@ export function TextInputTest() {
         itShould="not show text context menu when long press">
         <ContextMenuHiddenTest />
       </TestCase.Example>
-      <TestCase.Example modal itShould="select text on focus">
+      <TestCase.Example tags={['C_API']} modal itShould="select text on focus">
         <TextInput
           value="selectTextOnFocus"
           selectTextOnFocus
           style={styles.textInput}
+        />
+        <TextInput
+          value={'selectTextOnFocus \n but multiline'}
+          selectTextOnFocus
+          multiline
+          style={[styles.textInputBigger, {marginTop: 10}]}
         />
       </TestCase.Example>
       <TestCase.Example
@@ -603,6 +620,17 @@ export function TextInputTest() {
         itShould="set cursorColor to red after pressing button (setNativeProps)">
         <SetNativePropsTest />
       </TestCase.Example>
+      <TestCase.Example
+        tags={['C_API']}
+        modal
+        itShould="select only Selection word (selectTextOnFocus && selection)">
+        <TextInput
+          style={styles.textInput}
+          selection={{start: 4, end: 13}}
+          value="TextSelectionTest"
+          selectTextOnFocus
+        />
+      </TestCase.Example>
     </TestSuite>
   );
 }
@@ -628,6 +656,12 @@ const SelectionTest = () => {
         style={styles.textInput}
         value="TextSelectionTest"
         selection={{start: 4, end: 13}}
+      />
+      <TextInput
+        style={[styles.textInputBigger, {marginTop: 10}]}
+        value={'TextSelect\nionTest'}
+        selection={{start: 4, end: 13}}
+        multiline
       />
     </View>
   );
@@ -830,6 +864,7 @@ const TextInputValueSetProgrammatically = () => {
 
 const ControlledSelectionTest = () => {
   const [value, setValue] = useState('TextSelectionTest');
+  const [valueM, setValueM] = useState('TextSelect\nionTest');
 
   return (
     <View>
@@ -838,6 +873,13 @@ const ControlledSelectionTest = () => {
         value={value}
         onChange={event => setValue(event.nativeEvent.text)}
         selection={{start: 4, end: 13}}
+      />
+      <TextInput
+        style={[styles.textInputBigger, {marginTop: 10}]}
+        value={valueM}
+        onChange={event => setValueM(event.nativeEvent.text)}
+        selection={{start: 4, end: 13}}
+        multiline
       />
     </View>
   );

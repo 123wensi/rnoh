@@ -38,8 +38,6 @@ class TextInputNode : public TextInputNodeBase {
 
   void setTextContent(std::string const& textContent);
 
-  void setTextSelection(int32_t start, int32_t end);
-
   void setCaretHidden(bool hidden);
 
   void setInputType(ArkUI_TextInputType keyboardType);

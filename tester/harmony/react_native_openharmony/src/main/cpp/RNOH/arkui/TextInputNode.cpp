@@ -100,13 +100,6 @@ void TextInputNode::setTextContent(std::string const& textContent) {
       m_nodeHandle, NODE_TEXT_INPUT_TEXT, &item));
 }
 
-void TextInputNode::setTextSelection(int32_t start, int32_t end) {
-  std::array<ArkUI_NumberValue, 2> value = {{{.i32 = start}, {.i32 = end}}};
-  ArkUI_AttributeItem item = {value.data(), value.size()};
-  maybeThrow(NativeNodeApi::getInstance()->setAttribute(
-      m_nodeHandle, NODE_TEXT_INPUT_TEXT_SELECTION, &item));
-}
-
 void TextInputNode::setSelectedBackgroundColor(
     facebook::react::SharedColor const& color) {
   ArkUI_NumberValue selectedBackgroundColor = {

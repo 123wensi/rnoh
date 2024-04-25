@@ -29,10 +29,15 @@ void TextInputComponentInstance::onSubmit() {
 
 void TextInputComponentInstance::onBlur() {
   this->m_focused = false;
-  if (m_props->traits.clearButtonMode == facebook::react::TextInputAccessoryVisibilityMode::WhileEditing) {
-    m_textInputNode.setCancelButtonMode(facebook::react::TextInputAccessoryVisibilityMode::Never);
-  } else if (m_props->traits.clearButtonMode == facebook::react::TextInputAccessoryVisibilityMode::UnlessEditing) {
-    m_textInputNode.setCancelButtonMode(facebook::react::TextInputAccessoryVisibilityMode::Always);
+  if (m_props->traits.clearButtonMode ==
+      facebook::react::TextInputAccessoryVisibilityMode::WhileEditing) {
+    m_textInputNode.setCancelButtonMode(
+        facebook::react::TextInputAccessoryVisibilityMode::Never);
+  } else if (
+      m_props->traits.clearButtonMode ==
+      facebook::react::TextInputAccessoryVisibilityMode::UnlessEditing) {
+    m_textInputNode.setCancelButtonMode(
+        facebook::react::TextInputAccessoryVisibilityMode::Always);
   }
   m_eventEmitter->onBlur(getTextInputMetrics());
   m_eventEmitter->onEndEditing(getTextInputMetrics());
@@ -44,10 +49,18 @@ void TextInputComponentInstance::onFocus() {
     m_textAreaNode.setTextContent("");
     m_textInputNode.setTextContent("");
   }
-  if (m_props->traits.clearButtonMode == facebook::react::TextInputAccessoryVisibilityMode::WhileEditing) {
+  if (m_props->traits.selectTextOnFocus) {
+    m_textInputNode.setTextSelection(0, m_content.size());
+    m_textAreaNode.setTextSelection(0, m_content.size());
+  }
+  if (m_props->traits.clearButtonMode ==
+      facebook::react::TextInputAccessoryVisibilityMode::WhileEditing) {
     m_textInputNode.setCancelButtonMode(m_props->traits.clearButtonMode);
-  } else if (m_props->traits.clearButtonMode == facebook::react::TextInputAccessoryVisibilityMode::UnlessEditing) {
-    m_textInputNode.setCancelButtonMode(facebook::react::TextInputAccessoryVisibilityMode::Never);
+  } else if (
+      m_props->traits.clearButtonMode ==
+      facebook::react::TextInputAccessoryVisibilityMode::UnlessEditing) {
+    m_textInputNode.setCancelButtonMode(
+        facebook::react::TextInputAccessoryVisibilityMode::Never);
   }
   m_eventEmitter->onFocus(getTextInputMetrics());
 }
@@ -220,28 +233,33 @@ void TextInputComponentInstance::onPropsChanged(
   if (!m_props ||
       props->traits.clearButtonMode != m_props->traits.clearButtonMode) {
     if (m_focused) {
-      if (props->traits.clearButtonMode == 
+      if (props->traits.clearButtonMode ==
           facebook::react::TextInputAccessoryVisibilityMode::WhileEditing) {
         m_textInputNode.setCancelButtonMode(props->traits.clearButtonMode);
-      } else if (props->traits.clearButtonMode == 
-                 facebook::react::TextInputAccessoryVisibilityMode::UnlessEditing) {
-        m_textInputNode.setCancelButtonMode(facebook::react::TextInputAccessoryVisibilityMode::Never);
+      } else if (
+          props->traits.clearButtonMode ==
+          facebook::react::TextInputAccessoryVisibilityMode::UnlessEditing) {
+        m_textInputNode.setCancelButtonMode(
+            facebook::react::TextInputAccessoryVisibilityMode::Never);
       }
     } else {
-      if (props->traits.clearButtonMode == 
+      if (props->traits.clearButtonMode ==
           facebook::react::TextInputAccessoryVisibilityMode::WhileEditing) {
-        m_textInputNode.setCancelButtonMode(facebook::react::TextInputAccessoryVisibilityMode::Never);
-      } else if (props->traits.clearButtonMode == 
-                 facebook::react::TextInputAccessoryVisibilityMode::UnlessEditing) {
-        m_textInputNode.setCancelButtonMode(facebook::react::TextInputAccessoryVisibilityMode::Always);
+        m_textInputNode.setCancelButtonMode(
+            facebook::react::TextInputAccessoryVisibilityMode::Never);
+      } else if (
+          props->traits.clearButtonMode ==
+          facebook::react::TextInputAccessoryVisibilityMode::UnlessEditing) {
+        m_textInputNode.setCancelButtonMode(
+            facebook::react::TextInputAccessoryVisibilityMode::Always);
       }
     }
 
-    if (props->traits.clearButtonMode == 
-        facebook::react::TextInputAccessoryVisibilityMode::Always ||
-        props->traits.clearButtonMode == 
-        facebook::react::TextInputAccessoryVisibilityMode::Never) {
-          m_textInputNode.setCancelButtonMode(props->traits.clearButtonMode);
+    if (props->traits.clearButtonMode ==
+            facebook::react::TextInputAccessoryVisibilityMode::Always ||
+        props->traits.clearButtonMode ==
+            facebook::react::TextInputAccessoryVisibilityMode::Never) {
+      m_textInputNode.setCancelButtonMode(props->traits.clearButtonMode);
     }
   }
   if (!m_props ||
@@ -266,29 +284,18 @@ void TextInputComponentInstance::setLayout(
 void TextInputComponentInstance::handleCommand(
     std::string const& commandName,
     folly::dynamic const& args) {
-  if (m_multiline) {
-    if (commandName == "focus") {
-      m_textAreaNode.setFocusStatus(1);
-    }
-
-    if (commandName == "blur") {
-      m_textAreaNode.setFocusStatus(0);
-    }
-    return;
-  }
   if (commandName == "focus") {
-    m_textInputNode.setFocusStatus(1);
-  }
-
-  if (commandName == "blur") {
-    m_textInputNode.setFocusStatus(0);
-  }
-
-  if (commandName == "setTextAndSelection" && args.isArray() &&
+    focus();
+  } else if (commandName == "blur") {
+    blur();
+  } else if (
+      commandName == "setTextAndSelection" && args.isArray() &&
       args.size() == 4 && args[0].asInt() >= m_nativeEventCount) {
     m_textInputNode.setTextContent(args[1].asString());
+    m_textAreaNode.setTextContent(args[1].asString());
     if (args[2].asInt() >= 0 && args[3].asInt() >= 0) {
       m_textInputNode.setTextSelection(args[2].asInt(), args[3].asInt());
+      m_textAreaNode.setTextSelection(args[2].asInt(), args[3].asInt());
     }
   }
 }
@@ -316,6 +323,14 @@ ArkUINode& TextInputComponentInstance::getLocalRootArkUINode() {
     return m_textAreaNode;
   }
   return m_textInputNode;
+}
+
+void TextInputComponentInstance::focus() {
+  getLocalRootArkUINode().setFocusStatus(1);
+}
+
+void TextInputComponentInstance::blur() {
+  getLocalRootArkUINode().setFocusStatus(0);
 }
 
 } // namespace rnoh

@@ -3,12 +3,13 @@
 #include "NativeNodeApi.h"
 #include "RNOH/arkui/conversions.h"
 
-static constexpr std::array<ArkUI_NodeEventType, 5> TEXT_AREA_NODE_EVENT_TYPES =
-    {NODE_TEXT_AREA_ON_PASTE,
-     NODE_TEXT_AREA_ON_CHANGE,
-     NODE_ON_FOCUS,
-     NODE_ON_BLUR,
-     NODE_TEXT_AREA_ON_TEXT_SELECTION_CHANGE};
+static constexpr std::array TEXT_AREA_NODE_EVENT_TYPES = {
+    NODE_TEXT_AREA_ON_PASTE,
+    NODE_TEXT_AREA_ON_CHANGE,
+    NODE_TEXT_INPUT_ON_CUT,
+    NODE_ON_FOCUS,
+    NODE_ON_BLUR,
+    NODE_TEXT_AREA_ON_TEXT_SELECTION_CHANGE};
 
 namespace rnoh {
 
@@ -60,6 +61,10 @@ void TextAreaNode::onNodeEvent(
       m_textAreaNodeDelegate->onChange(std::move(text));
     }
   } else if (eventType == ArkUI_NodeEventType::NODE_TEXT_AREA_ON_PASTE) {
+    if (m_textAreaNodeDelegate != nullptr) {
+      m_textAreaNodeDelegate->onPasteOrCut();
+    }
+  } else if (eventType == ArkUI_NodeEventType::NODE_TEXT_INPUT_ON_CUT) {
     if (m_textAreaNodeDelegate != nullptr) {
       m_textAreaNodeDelegate->onPasteOrCut();
     }

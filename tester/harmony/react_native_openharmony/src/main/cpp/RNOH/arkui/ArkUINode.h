@@ -85,6 +85,7 @@ class ArkUINode {
   virtual ArkUINode& resetOpacityTransition();
   virtual ArkUINode& setOffset(float x, float y);
   virtual ArkUINode& setEnabled(bool enabled);
+  virtual ArkUINode& setFocusStatus(int32_t focus);
 
   virtual ArkUINode& resetAccessibilityText();
 

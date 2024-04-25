@@ -47,13 +47,6 @@ void TextInputNodeBase::setResponseRegion(
       m_nodeHandle, NODE_RESPONSE_REGION, &item));
 }
 
-void TextInputNodeBase::setFocusStatus(int32_t focus) {
-  ArkUI_NumberValue value[] = {{.i32 = focus}};
-  ArkUI_AttributeItem item = {value, sizeof(value) / sizeof(ArkUI_NumberValue)};
-  maybeThrow(NativeNodeApi::getInstance()->setAttribute(
-      m_nodeHandle, NODE_FOCUS_STATUS, &item));
-}
-
 void TextInputNodeBase::setFontColor(
     facebook::react::SharedColor const& color) {
   uint32_t colorValue = *color;
@@ -107,5 +100,12 @@ void TextInputNodeBase::setTextAlign(
   ArkUI_AttributeItem item = {.value = value, .size = 1};
   maybeThrow(NativeNodeApi::getInstance()->setAttribute(
       m_nodeHandle, NODE_TEXT_ALIGN, &item));
+}
+
+void TextInputNodeBase::setTextSelection(int32_t start, int32_t end) {
+  std::array<ArkUI_NumberValue, 2> value = {{{.i32 = start}, {.i32 = end}}};
+  ArkUI_AttributeItem item = {.value = value.data(), .size = 2};
+  maybeThrow(NativeNodeApi::getInstance()->setAttribute(
+      m_nodeHandle, NODE_TEXT_INPUT_TEXT_SELECTION, &item));
 }
 } // namespace rnoh
