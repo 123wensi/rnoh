@@ -30,6 +30,21 @@ export function TextTest() {
       </TestCase.Example>
       <TestCase.Example
         tags={['C_API']}
+        itShould="show 3 texts each with a different text break startegy">
+        <View style={styles.bigContainer}>
+          <Text style={styles.smallTextWidth} textBreakStrategy="simple">
+            Lorem ipsum dolor sit amet
+          </Text>
+          <Text style={styles.smallTextWidth} textBreakStrategy="highQuality">
+            Lorem ipsum dolor sit amet
+          </Text>
+          <Text style={styles.smallTextWidth} textBreakStrategy="balanced">
+            Lorem ipsum dolor sit amet
+          </Text>
+        </View>
+      </TestCase.Example>
+      <TestCase.Example
+        tags={['C_API']}
         itShould="show 3 texts each with a different line break startegy"
         skip={{android: true, harmony: true}}
         //https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/274

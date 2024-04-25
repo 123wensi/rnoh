@@ -294,3 +294,15 @@ int32_t TextConversions::getStackAlign(
   }
   return convertMap.at(alignVertical).at(alignHorizon);
 }
+
+ArkUI_WordBreak TextConversions::getArkUIWordBreakStrategy(
+    facebook::react::TextBreakStrategy textBreakStrategy) {
+  switch (textBreakStrategy) {
+    case facebook::react::TextBreakStrategy::Simple:
+      return ArkUI_WordBreak::ARKUI_WORD_BREAK_BREAK_ALL;
+    case facebook::react::TextBreakStrategy::HighQuality:
+      return ArkUI_WordBreak::ARKUI_WORD_BREAK_NORMAL;
+    case facebook::react::TextBreakStrategy::Balanced:
+      return ArkUI_WordBreak::ARKUI_WORD_BREAK_BREAK_WORD;
+  }
+}

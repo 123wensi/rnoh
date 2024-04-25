@@ -40,6 +40,8 @@ class TextConversions {
   static int32_t getStackAlign(
       const facebook::react::TextAlignment& alignHorizon,
       const std::string& alignVertical);
+  static ArkUI_WordBreak getArkUIWordBreakStrategy(
+      facebook::react::TextBreakStrategy textBreakStrategy);
 
  private:
   static std::pair<std::optional<float>, std::optional<float>>

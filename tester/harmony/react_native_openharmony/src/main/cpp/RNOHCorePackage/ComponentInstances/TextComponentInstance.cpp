@@ -338,6 +338,11 @@ void TextComponentInstance::setParagraphAttributes(
     m_textNode.setTextOverflow(ARKUI_TEXT_OVERFLOW_ELLIPSIS);
     m_textNode.setTextEllipsisMode(ellipsizeMode);
   }
+
+  // TextBreakStrategy
+  auto textBreak = TextConversions::getArkUIWordBreakStrategy(
+      paragraphAttributes.textBreakStrategy);
+  m_textNode.setWordBreak(textBreak);
 }
 
 std::string TextComponentInstance::stringCapitalize(

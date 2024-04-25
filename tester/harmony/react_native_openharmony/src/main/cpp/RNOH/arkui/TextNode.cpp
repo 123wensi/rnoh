@@ -277,4 +277,13 @@ TextNode::setPadding(float top, float right, float bottom, float left) {
   return *this;
 }
 
+TextNode& TextNode::setWordBreak(ArkUI_WordBreak wordBreak) {
+  ArkUI_NumberValue value = {.i32 = wordBreak};
+  ArkUI_AttributeItem item = {&value, 1};
+  maybeThrow(NativeNodeApi::getInstance()->setAttribute(
+      m_nodeHandle, NODE_TEXT_WORD_BREAK, &item));
+
+  return *this;
+}
+
 } // namespace rnoh

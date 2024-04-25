@@ -5,7 +5,6 @@
 #include "RNOH/arkui/SpanNode.h"
 #include "RNOH/arkui/StackNode.h"
 #include "RNOH/arkui/TextNode.h"
-#include "TextConversions.h"
 
 namespace rnoh {
 class TextComponentInstance
@@ -22,7 +21,7 @@ class TextComponentInstance
 
  public:
   TextComponentInstance(Context context);
-  ~TextComponentInstance();
+  ~TextComponentInstance() override;
   StackNode& getLocalRootArkUINode() override;
   std::vector<TouchTarget::Shared> getTouchTargetChildren() override;
 

@@ -3,6 +3,7 @@
 #include <native_drawing/drawing_text_typography.h>
 #include "RNOH/ArkJS.h"
 #include "RNOH/ArkUITypography.h"
+#include "RNOHCorePackage/ComponentInstances/TextConversions.h"
 #include "TextMeasurer.h"
 
 namespace rnoh {
@@ -155,10 +156,17 @@ ArkUITypography TextMeasurer::measureTypography(
     LayoutConstraints const& layoutConstraints) {
   UniqueTypographyStyle typographyStyle(
       OH_Drawing_CreateTypographyStyle(), OH_Drawing_DestroyTypographyStyle);
+
   if (paragraphAttributes.maximumNumberOfLines > 0) {
     OH_Drawing_SetTypographyTextMaxLines(
         typographyStyle.get(), paragraphAttributes.maximumNumberOfLines);
   }
+
+  OH_Drawing_SetTypographyTextWordBreakType(
+      typographyStyle.get(),
+      TextConversions::getArkUIWordBreakStrategy(
+          paragraphAttributes.textBreakStrategy));
+
   if (!attributedString.getFragments().empty()) {
     auto textAlign =
         attributedString.getFragments()[0].textAttributes.alignment;
@@ -167,6 +175,7 @@ ArkUITypography TextMeasurer::measureTypography(
           typographyStyle.get(), getOHDrawingTextAlign(textAlign.value()));
     }
   }
+
   ArkUITypographyBuilder typographyBuilder(typographyStyle.get());
   for (auto const& fragment : attributedString.getFragments()) {
     typographyBuilder.addFragment(fragment);
