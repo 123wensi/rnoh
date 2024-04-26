@@ -46,14 +46,18 @@ ArkUINode& ArkUINode::setPosition(facebook::react::Point const& position) {
 }
 
 ArkUINode& ArkUINode::setSize(facebook::react::Size const& size) {
-  ArkUI_NumberValue widthValue[] = {static_cast<float>(size.width)};
+  // HACK: ArkUI doesn't handle 0-sized views properly
+  ArkUI_NumberValue widthValue[] = {
+      static_cast<float>(size.width > 0 ? size.width : 0.01)};
   ArkUI_AttributeItem widthItem = {
       widthValue, sizeof(widthValue) / sizeof(ArkUI_NumberValue)};
 
   maybeThrow(NativeNodeApi::getInstance()->setAttribute(
       m_nodeHandle, NODE_WIDTH, &widthItem));
 
-  ArkUI_NumberValue heightValue[] = {static_cast<float>(size.height)};
+  // HACK: ArkUI doesn't handle 0-sized views properly
+  ArkUI_NumberValue heightValue[] = {
+      static_cast<float>(size.height > 0 ? size.height : 0.01)};
   ArkUI_AttributeItem heightItem = {
       heightValue, sizeof(heightValue) / sizeof(ArkUI_NumberValue)};
 
