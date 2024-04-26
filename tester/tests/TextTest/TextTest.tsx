@@ -16,6 +16,29 @@ export function TextTest() {
       <TextPaddingTest />
       <TextAccessibilityTest />
       <TextNestedTest />
+      <TestCase.Manual
+        tags={['C_API']}
+        itShould='pass after pressing "Press me!"'
+        initialState={false}
+        arrange={({setState}) => (
+          <Text onPress={() => setState(false)}>
+            <Text>中中文中中文中中文</Text>
+            <Text
+              style={{
+                color: 'red',
+              }}
+              onPress={() => {
+                setState(true);
+              }}>
+              Press Me!!
+            </Text>
+            <Text>rest of the text that's not pressable</Text>
+          </Text>
+        )}
+        assert={({expect, state}) => {
+          expect(state).to.be.true;
+        }}
+      />
       <TestCase.Example tags={['C_API']} itShould="show selectable text">
         <View style={styles.smallContainer}>
           <Text style={styles.smallText} selectable={true}>

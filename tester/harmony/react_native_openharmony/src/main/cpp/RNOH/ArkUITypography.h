@@ -136,6 +136,16 @@ class ArkUITypographyBuilder final {
   }
 
  private:
+  size_t utf8Length(const std::string& str) {
+    size_t length = 0;
+    for (auto c : str) {
+      if ((c & 0x80) == 0 || (c & 0xc0) == 0xc0) {
+        length++;
+      }
+    }
+    return length;
+  }
+
   void addTextFragment(
       const facebook::react::AttributedString::Fragment& fragment) {
     auto textStyle = OH_Drawing_CreateTextStyle();
@@ -173,7 +183,7 @@ class ArkUITypographyBuilder final {
     OH_Drawing_TypographyHandlerAddText(
         m_typographyHandler.get(), fragment.string.c_str());
     OH_Drawing_DestroyTextStyle(textStyle);
-    m_fragmentLengths.push_back(fragment.string.length());
+    m_fragmentLengths.push_back(utf8Length(fragment.string));
   }
 
   void addAttachment(
