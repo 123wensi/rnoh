@@ -29,7 +29,7 @@ class ScrollViewComponentJSIBinder : public ViewComponentJSIBinder {
     object.setProperty(rt, "inverted", "boolean");
     object.setProperty(rt, "maintainVisibleContentPosition", "Object");
     object.setProperty(rt, "scrollToOverflowEnabled", "boolean");
-
+    object.setProperty(rt, "centerContent", "boolean");
     return object;
   }
 

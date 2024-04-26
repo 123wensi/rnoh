@@ -98,6 +98,14 @@ void rnoh::ScrollViewComponentInstance::onPropsChanged(
     updateStateWithContentOffset(props->contentOffset);
   }
 
+  if (!m_props || props->centerContent != m_props->centerContent) {
+    if (props->centerContent == 1 && isContentSmallerThanContainer()) {
+      m_scrollNode.setCenterContent(true);
+    }else{
+      m_scrollNode.setCenterContent(false);       
+    }
+  }
+
   setScrollSnap(
       props->snapToStart,
       props->snapToEnd,

@@ -182,4 +182,13 @@ ScrollNode& ScrollNode::setEnablePaging(bool enablePaging) {
   return *this;
 }
 
+ScrollNode& ScrollNode::setCenterContent(bool centerContent) {
+  ArkUI_Alignment alignmentMode = centerContent ? 
+    ArkUI_Alignment::ARKUI_ALIGNMENT_CENTER : ArkUI_Alignment::ARKUI_ALIGNMENT_TOP_START;
+  std::array<ArkUI_NumberValue, 1> value = {{{.i32 = alignmentMode}}};
+  ArkUI_AttributeItem item = {value.data(), value.size()};
+  maybeThrow(NativeNodeApi::getInstance()->setAttribute(
+      m_nodeHandle, NODE_STACK_ALIGN_CONTENT, &item));
+  return *this;
+}
 } // namespace rnoh
