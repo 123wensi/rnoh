@@ -130,7 +130,7 @@ XComponentSurface::~XComponentSurface() noexcept {
     this->stop();
   }
   m_scheduler->unregisterSurface(m_surfaceHandler);
-  if (m_rootView != nullptr) {
+  if (m_componentInstanceRegistry != nullptr && m_rootView != nullptr) {
     // NOTE: we don't detach the view from XComponent here,
     // since the Surface must already be `.stop()`ed before it's `unregistered`
     m_componentInstanceRegistry->deleteByTag(m_rootView->getTag());
