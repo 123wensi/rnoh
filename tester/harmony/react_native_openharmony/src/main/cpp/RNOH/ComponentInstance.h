@@ -136,6 +136,14 @@ class ComponentInstance
     return std::vector<TouchTarget::Shared>(children.begin(), children.end());
   }
 
+  void setIgnoredPropKeys(std::unordered_set<std::string> propKeys) {
+    m_ignoredPropKeys = std::move(propKeys);
+  }
+
+  std::unordered_set<std::string> const& getIgnoredPropKeys() const {
+    return m_ignoredPropKeys;
+  }
+
  protected:
   virtual void onChildInserted(
       ComponentInstance::Shared const& childComponentInstance,
@@ -163,6 +171,7 @@ class ComponentInstance
   facebook::react::BorderMetrics m_oldBorderMetrics;
   facebook::react::LayoutMetrics m_layoutMetrics;
   Dependencies::Shared m_deps;
+  std::unordered_set<std::string> m_ignoredPropKeys;
 };
 
 } // namespace rnoh

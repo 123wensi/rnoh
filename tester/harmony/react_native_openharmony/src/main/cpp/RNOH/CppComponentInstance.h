@@ -176,6 +176,9 @@ class CppComponentInstance : public ComponentInstance {
 
  protected:
   virtual void onPropsChanged(SharedConcreteProps const& props) {
+    auto isOpacityManagedByAnimated = getIgnoredPropKeys().count("opacity") > 0;
+    auto isTransformManagedByAnimated =
+        getIgnoredPropKeys().count("transform") > 0;
     auto old = m_props;
     if (!old || *(props->backgroundColor) != *(old->backgroundColor)) {
       this->getLocalRootArkUINode().setBackgroundColor(props->backgroundColor);
@@ -213,9 +216,10 @@ class CppComponentInstance : public ComponentInstance {
           props->shadowRadius);
     }
 
-    if (!old || props->transform != old->transform ||
-        abs(m_oldPointScaleFactor - m_layoutMetrics.pointScaleFactor) >
-            0.001f) {
+    if (!isTransformManagedByAnimated &&
+        (!old || props->transform != old->transform ||
+         abs(m_oldPointScaleFactor - m_layoutMetrics.pointScaleFactor) >
+             0.001f)) {
       m_oldPointScaleFactor = m_layoutMetrics.pointScaleFactor;
       this->getLocalRootArkUINode().setTransform(
           props->transform, m_layoutMetrics.pointScaleFactor);
@@ -245,10 +249,10 @@ class CppComponentInstance : public ComponentInstance {
     if (!old || props->accessible != old->accessible) {
       this->getLocalRootArkUINode().setAccessibilityGroup(props->accessible);
     }
-
-    if (!old || props->opacity != old->opacity ||
-        props->transform != old->transform ||
-        props->backfaceVisibility != old->backfaceVisibility) {
+    if (!isOpacityManagedByAnimated && !isTransformManagedByAnimated &&
+        (!old || props->opacity != old->opacity ||
+         props->transform != old->transform ||
+         props->backfaceVisibility != old->backfaceVisibility)) {
       this->setOpacity(props);
     }
 

@@ -51,14 +51,22 @@ void SchedulerDelegateCAPI::synchronouslyUpdateViewOnUIThread(
     return;
   }
 
+  std::unordered_set<std::string> propKeys =
+      componentInstance->getIgnoredPropKeys();
+  for (const auto& key : props.keys()) {
+    propKeys.insert(key.getString());
+  }
+
   auto oldProps = componentInstance->getProps();
   auto newProps = componentDescriptor.cloneProps(
       react::PropsParserContext{surfaceId.value(), *m_contextContainer},
       oldProps,
       std::move(props));
 
+  componentInstance->setIgnoredPropKeys({});
   componentInstance->setProps(newProps);
   componentInstance->finalizeUpdates();
+  componentInstance->setIgnoredPropKeys(std::move(propKeys));
 }
 
 } // namespace rnoh
