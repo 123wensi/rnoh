@@ -14,8 +14,7 @@ import {Button, TestCase} from '../components';
 export function ModalTest() {
   return (
     <TestSuite name="Modal">
-      <TestCase.Example itShould="show modal">
-        tags={['C_API']}
+      <TestCase.Example itShould="show modal" tags={['C_API']}>
         <ModalExample />
       </TestCase.Example>
       <TestCase.Manual
@@ -33,6 +32,11 @@ export function ModalTest() {
           expect(state).to.be.true;
         }}
       />
+      <TestCase.Example
+        itShould="show orientation change history when Modal is open"
+        tags={['C_API']}>
+        <ModalExampleOrientation />
+      </TestCase.Example>
       <TestCase.Manual
         tags={['C_API']}
         itShould="show modal with slide animation"
@@ -83,6 +87,44 @@ export function ModalTest() {
     </TestSuite>
   );
 }
+
+const ModalExampleOrientation = () => {
+  const [orientationHistory, setOrientationHistory] = useState<string[]>([]);
+  const [modalVisible, setModalVisible] = useState(false);
+  return (
+    <View>
+      <Text style={[styles.textStyle, {color: 'black'}]}>
+        {modalVisible ? 'shown' : 'hidden'}
+      </Text>
+      <Modal
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(!modalVisible);
+        }}
+        onOrientationChange={event => {
+          const orientation = event.nativeEvent.orientation;
+          setOrientationHistory(prev => [...prev, `${orientation}`]);
+        }}>
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text style={{marginVertical: 20}}>
+              Orientation history: {JSON.stringify(orientationHistory)}
+            </Text>
+            <Button
+              label="Hide Modal"
+              onPress={() => {
+                setModalVisible(false);
+                setOrientationHistory([]);
+              }}
+            />
+          </View>
+        </View>
+      </Modal>
+      <Button label="Show Modal" onPress={() => setModalVisible(true)} />
+    </View>
+  );
+};
 
 const ModalExample = (props: ModalProps & {withTextInput?: boolean}) => {
   const [modalVisible, setModalVisible] = useState(false);

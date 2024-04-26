@@ -13,11 +13,14 @@ class ModalHostViewComponentInstance
       public ArkUIDialogDelegate,
       public ArkTSMessageHub::Observer {
  private:
+  using ScreenOrientation = facebook::react::ModalHostViewEventEmitter::
+      OnOrientationChangeOrientation;
   StackNode m_virtualNode;
   StackNode m_rootStackNode;
   ArkUIDialogHandler m_dialogHandler;
   std::unique_ptr<TouchEventHandler> m_touchHandler;
   std::shared_ptr<ArkTSMessageHandler> m_displaySizeChangeHandler;
+  std::optional<ScreenOrientation> m_screenOrientation;
 
  private:
   void updateDisplaySize(

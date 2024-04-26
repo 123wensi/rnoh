@@ -50,10 +50,19 @@ class ModalHostTouchHandler : public TouchEventHandler {
 void ModalHostViewComponentInstance::updateDisplaySize(
     DisplayMetrics const& displayMetrics,
     SharedConcreteState const& state) {
-  auto screenMetrics = displayMetrics.screenPhysicalPixels;
+  auto windowMetrics = displayMetrics.windowPhysicalPixels;
+  auto screenOrientation = (displayMetrics.windowPhysicalPixels.height >=
+                            displayMetrics.windowPhysicalPixels.width)
+      ? ScreenOrientation::Portrait
+      : ScreenOrientation::Landscape;
+
+  if (m_screenOrientation != screenOrientation) {
+    m_screenOrientation = screenOrientation;
+    m_eventEmitter->onOrientationChange({.orientation = screenOrientation});
+  }
   facebook::react::Size screenSize = {
-      .width = screenMetrics.width / screenMetrics.scale,
-      .height = screenMetrics.height / screenMetrics.scale};
+      .width = windowMetrics.width / windowMetrics.scale,
+      .height = windowMetrics.height / windowMetrics.scale};
   state->updateState({screenSize});
   if (m_props != nullptr &&
       m_props->animationType ==
@@ -64,7 +73,7 @@ void ModalHostViewComponentInstance::updateDisplaySize(
 
 void ModalHostViewComponentInstance::updateSlideTransition(
     DisplayMetrics const& displayMetrics) {
-  auto screenSize = displayMetrics.screenPhysicalPixels;
+  auto screenSize = displayMetrics.windowPhysicalPixels;
   m_rootStackNode.setTranslateTransition(
       0, float(screenSize.height / screenSize.scale), ANIMATION_DURATION);
 }
