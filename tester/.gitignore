@@ -41,6 +41,7 @@ local.properties
 .cxx/
 *.keystore
 !debug.keystore
+BuildProfile.ets
 
 # node.js
 #
