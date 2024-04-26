@@ -1,15 +1,16 @@
 import type { DescriptorRegistry } from './DescriptorRegistry';
 import type { RNComponentCommandReceiver } from './RNComponentCommandHub';
-import  { RNInstance, RNInstanceImpl } from './RNInstance';
+import { RNInstance, RNInstanceImpl } from './RNInstance';
 import type { ComponentManagerRegistry } from './ComponentManagerRegistry';
 import { RNOHCoreContext } from './RNOHCoreContext';
+import { HttpClient } from '../HttpClient/HttpClient';
 
 export class RNOHContext extends RNOHCoreContext {
   static fromCoreContext(coreContext: RNOHCoreContext, rnInstance: RNInstance) {
     if (!(rnInstance instanceof RNInstanceImpl)) {
       throw new Error("RNInstance must extend RNInstanceImpl")
     }
-    return new RNOHContext("0.72.5",  rnInstance, coreContext);
+    return new RNOHContext("0.72.5", rnInstance, coreContext);
   }
 
   public get descriptorRegistry(): DescriptorRegistry {
@@ -26,6 +27,10 @@ export class RNOHContext extends RNOHCoreContext {
 
   public get rnInstance(): RNInstance {
     return this.rnInstanceImpl
+  }
+
+  public get httpClient(): HttpClient {
+    return this.rnInstance.httpClient;
   }
 
   protected constructor(

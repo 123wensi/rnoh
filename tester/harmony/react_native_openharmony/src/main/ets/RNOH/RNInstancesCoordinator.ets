@@ -12,6 +12,7 @@ import { DevMenu } from "./DevMenu"
 import { JSPackagerClientConfig } from "./JSPackagerClient"
 import { RNOHError } from "./RNOHError"
 import AbilityConfiguration from '@ohos.app.ability.Configuration';
+import { HttpClientProvider, DefaultHttpClientProvider } from './HttpClientProvider';
 
 /**
  * This interface allows providing dependencies in any order.
@@ -33,6 +34,7 @@ export type BuildMode = "DEBUG" | "RELEASE"
 export interface RNInstancesCoordinatorOptions {
   launchURI?: string
   onGetPackagerClientConfig?: (buildMode: BuildMode) => JSPackagerClientConfig | undefined
+  httpClientProvider?: HttpClientProvider
 }
 
 const RNOH_BANNER = '\n\n\n' +
@@ -109,7 +111,6 @@ export class RNInstancesCoordinator {
   private options: RNInstancesCoordinatorOptions | undefined
   private appState: AppState = "FOREGROUND"
   private defaultBackPressHandler: () => void
-
   private constructor(napiBridge: NapiBridge,
                       logger: RNOHLogger,
                       displayMetricsManager: DisplayMetricsManager,
@@ -131,11 +132,14 @@ export class RNInstancesCoordinator {
     this.options = options;
     this.jsPackagerClient = jsPackagerClient;
     this.defaultBackPressHandler = defaultBackPressHandler;
+    const httpClientProvider = options?.httpClientProvider ?? new DefaultHttpClientProvider()
     this.rnInstanceRegistry = new RNInstanceRegistry(
       this.rawLogger,
       napiBridge,
       this.devToolsController,
-      (rnInstance) => RNOHContext.fromCoreContext(this.rnohCoreContext, rnInstance))
+      (rnInstance) => RNOHContext.fromCoreContext(this.rnohCoreContext, rnInstance),
+      httpClientProvider,
+    )
     this.rnohCoreContext = RNOHCoreContext.create(
       this.rnInstanceRegistry,
       () => this.displayMetricsManager.getDisplayMetrics(),

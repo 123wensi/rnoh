@@ -4,6 +4,7 @@ import type { NapiBridge } from './NapiBridge';
 import type { RNOHContext } from './RNOHContext';
 import type { RNOHLogger } from './RNOHLogger';
 import type { DevToolsController } from "./DevToolsController"
+import { HttpClientProvider } from './HttpClientProvider';
 
 export class RNInstanceRegistry {
   private instanceMap: Map<number, RNInstanceImpl> = new Map();
@@ -12,7 +13,8 @@ export class RNInstanceRegistry {
     private logger: RNOHLogger,
     private napiBridge: NapiBridge,
     private devToolsController: DevToolsController,
-    private createRNOHContext: (rnInstance: RNInstance) => RNOHContext
+    private createRNOHContext: (rnInstance: RNInstance) => RNOHContext,
+    private httpClientProvider: HttpClientProvider,
   ) {
   }
 
@@ -35,6 +37,7 @@ export class RNInstanceRegistry {
       options.enableImageLoader ?? false,
       options.enableCAPIArchitecture ?? false,
       options.assetsDest,
+      this.httpClientProvider,
     )
     await instance.initialize(options.createRNPackages({}))
     this.instanceMap.set(id, instance)

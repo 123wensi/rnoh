@@ -19,6 +19,8 @@ import { DevToolsController } from './DevToolsController'
 import { RNOHError } from './RNOHError'
 import window from '@ohos.window'
 import { DevServerHelper } from './DevServerHelper';
+import { HttpClient } from '../HttpClient/HttpClient'
+import type { HttpClientProvider } from './HttpClientProvider'
 
 export type SurfaceContext = {
   width: number
@@ -78,7 +80,6 @@ type FeatureFlagName = "ENABLE_RN_INSTANCE_CLEAN_UP" | "NDK_TEXT_MEASUREMENTS" |
 export interface RNInstance {
   descriptorRegistry: DescriptorRegistry;
   cppEventEmitter: EventEmitter<Record<string, unknown[]>>
-
   /**
    * @deprecated Use RNOHContext::componentCommandReceiver
    */
@@ -129,6 +130,8 @@ export interface RNInstance {
 
   getArchitecture(): "ARK_TS" | "C_API"
 
+  get httpClient(): HttpClient,
+
   getAssetsDest(): string
 
   postMessageToCpp(name: string, payload: any): void
@@ -162,6 +165,7 @@ export class RNInstanceImpl implements RNInstance {
   public componentManagerRegistry: ComponentManagerRegistry;
   public lifecycleEventEmitter = new EventEmitter<LifecycleEventArgsByEventName>()
   public cppEventEmitter = new EventEmitter<Record<string, unknown[]>>()
+  public httpClient: HttpClient;
   private componentNameByDescriptorType = new Map<string, string>()
   private logger: RNOHLogger
   private surfaceHandles: Set<SurfaceHandle> = new Set()
@@ -190,7 +194,9 @@ export class RNInstanceImpl implements RNInstance {
     private shouldUseImageLoader: boolean,
     private shouldUseCApiArchitecture: boolean,
     private assetsDest: string,
+    httpClientProvider: HttpClientProvider,
   ) {
+    this.httpClient = httpClientProvider.getInstance(this)
     this.logger = injectedLogger.clone("RNInstance")
     if (this.shouldUseNDKToMeasureText) {
       this.enableFeatureFlag("NDK_TEXT_MEASUREMENTS")
@@ -268,7 +274,10 @@ export class RNInstanceImpl implements RNInstance {
       cppFeatureFlags.push("ENABLE_NDK_TEXT_MEASURING")
     }
     if (this.shouldUseCApiArchitecture && !this.frameNodeFactory) {
-      throw new RNOHError({ whatHappened: "frameNodeFactory is undefined, but it is required when C-API architecture is enabled", howCanItBeFixed: []})
+      throw new RNOHError({
+        whatHappened: "frameNodeFactory is undefined, but it is required when C-API architecture is enabled",
+        howCanItBeFixed: []
+      })
     }
     this.napiBridge.createReactNativeInstance(
       this.id,
@@ -522,6 +531,7 @@ export class RNInstanceImpl implements RNInstance {
     return this.initialBundleUrl
   }
 
+
   private subscribeToDevTools() {
     const emitter = this.devToolsController.eventEmitter;
     emitter.subscribe("TOGGLE_ELEMENT_INSPECTOR", () => this.emitDeviceEvent("toggleElementInspector", {}))
@@ -533,7 +543,7 @@ export class RNInstanceImpl implements RNInstance {
   }
 
   public postMessageToCpp(name: string, payload: any): void {
-    this.napiBridge.postMessageToCpp(name, {rnInstanceId: this.id, payload});
+    this.napiBridge.postMessageToCpp(name, { rnInstanceId: this.id, payload });
   }
 }
 

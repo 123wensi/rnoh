@@ -5,6 +5,7 @@ import { TurboModule } from "../../../RNOH/TurboModule";
 import { NetworkEventsDispatcher } from './NetworkEventDispatcher';
 import ArrayList from '@ohos.util.ArrayList';
 import { BlobMetadata } from '../Blob';
+import { CancelRequestCallback, HttpErrorResponse } from '../../../HttpClient/types';
 
 type ResponseType =
 | 'base64'
@@ -60,11 +61,11 @@ export type ResponseBodyHandler = {
 
 export class NetworkingTurboModule extends TurboModule {
   public static readonly NAME = 'Networking';
-  private nextId: number = 0
-  private requestMap: Map<number, http.HttpRequest> = new Map();
   private networkEventDispatcher: NetworkEventsDispatcher = new NetworkEventsDispatcher(this.ctx.rnInstance)
   private base64Helper: util.Base64Helper = new util.Base64Helper();
   private uriHandlers: ArrayList<UriHandler> = new ArrayList();
+  private requestCancellersById: Map<number, CancelRequestCallback> = new Map();
+  private nextId: number = 0
   private requestBodyHandlers: ArrayList<RequestBodyHandler> = new ArrayList();
   private responseBodyHandlers: ArrayList<ResponseBodyHandler> = new ArrayList();
 
@@ -136,6 +137,9 @@ export class NetworkingTurboModule extends TurboModule {
   }
 
   private encodeBody(data: Object): string | ArrayBuffer | Object {
+    if ('trackingName' in data) {
+      delete data.trackingName;
+    }
     if ('string' in data) {
       return data.string as string
     }
@@ -162,10 +166,9 @@ export class NetworkingTurboModule extends TurboModule {
     return formData;
   }
 
-  sendRequest(query: Query, callback: (requestId: number) => void) {
-    const requestId = this.createId()
-    const httpRequest = http.createHttp();
-
+  async sendRequest(query: Query, callback: (requestId: number) => void) {
+    const httpClient = this.ctx.rnInstance.httpClient;
+    const requestId = this.createId();
     for (const handler of this.uriHandlers) {
       if (handler.supports(query)) {
         const response = handler.fetch(query);
@@ -200,9 +203,7 @@ export class NetworkingTurboModule extends TurboModule {
     else {
       extraData = this.encodeBody(query.data);
     }
-
-    httpRequest.request(
-      query.url,
+    const { cancel, promise } = httpClient.sendRequest(query.url,
       {
         method: this.REQUEST_METHOD_BY_NAME[query.method],
         header: query.headers,
@@ -210,44 +211,44 @@ export class NetworkingTurboModule extends TurboModule {
         connectTimeout: query.timeout,
         readTimeout: query.timeout,
         multiFormDataList: multiFormDataList
-      },
-      async (err, data) => {
-        if (!err) {
-          this.networkEventDispatcher.dispatchDidReceiveNetworkResponse(requestId, data.responseCode, data.header, query.url);
-          for (const handler of this.responseBodyHandlers) {
-            if (handler.supports(query.responseType)) {
+      })
+    this.requestCancellersById.set(requestId, cancel);
 
-              this.networkEventDispatcher.dispatchDidReceiveNetworkData(requestId, handler.handleResponse(data.result));
-              this.networkEventDispatcher.dispatchDidCompleteNetworkResponse(requestId);
-              return;
-            }
-          }
-          this.networkEventDispatcher.dispatchDidReceiveNetworkData(requestId, await this.encodeResponse(data.result, query.responseType));
+    promise.then(async (httpResponse) => {
+      this.networkEventDispatcher.dispatchDidReceiveNetworkResponse(requestId, httpResponse.statusCode, httpResponse.headers, query.url);
+      if (this.requestCancellersById[requestId]) {
+        this.requestCancellersById.delete(requestId);
+      }
+      for (const handler of this.responseBodyHandlers) {
+        if (handler.supports(query.responseType)) {
+          this.networkEventDispatcher.dispatchDidReceiveNetworkData(requestId, handler.handleResponse(httpResponse.body));
           this.networkEventDispatcher.dispatchDidCompleteNetworkResponse(requestId);
-        } else {
-          this.networkEventDispatcher.dispatchDidReceiveNetworkResponse(requestId, data?.responseCode ?? 0, {
-          }, query.url)
-          this.networkEventDispatcher.dispatchDidCompleteNetworkResponseWithError(requestId, err.toString());
+          return;
         }
-        httpRequest.destroy();
-        this.requestMap.delete(requestId)
-      },
+      }
+      this.networkEventDispatcher.dispatchDidReceiveNetworkData(requestId, await this.encodeResponse(httpResponse.body, query.responseType));
+      this.networkEventDispatcher.dispatchDidCompleteNetworkResponse(requestId);
+    }).catch((errorResponse: HttpErrorResponse) => {
+      this.networkEventDispatcher.dispatchDidReceiveNetworkResponse(requestId, errorResponse.statusCode || 0, {
+      }, query.url)
+      this.networkEventDispatcher.dispatchDidCompleteNetworkResponseWithError(requestId, errorResponse.error.toString());
+      if (this.requestCancellersById[requestId]) {
+        this.requestCancellersById.delete(requestId);
+      }
+    });
 
-    );
 
-    this.requestMap.set(requestId, httpRequest);
     callback(requestId)
   }
 
   abortRequest(requestId: number) {
-    const httpRequest = this.requestMap.get(requestId);
-    if (httpRequest) {
-      httpRequest.destroy()
-      this.requestMap.delete(requestId)
+    if (this.requestCancellersById[requestId]) {
+      this.requestCancellersById[requestId]();
+      this.requestCancellersById.delete(requestId);
     }
   }
 
   private createId(): number {
-    return this.nextId++
+    return this.nextId++;
   }
 }

@@ -69,7 +69,6 @@ export const NetworkingTest = () => {
           const response = await fetch('https://reactnative.dev/movies.json');
           const result = await response.text();
           const parsed = JSON.parse(result);
-          console.log('parsed', parsed);
           expect(parsed.title).to.be.eq('The Basics - Networking');
         }}
       />

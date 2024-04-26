@@ -1,12 +1,12 @@
 import image from '@ohos.multimedia.image';
-import type {RemoteImageMemoryCache} from './RemoteImageCache';
-import {RemoteImageLoaderError} from './RemoteImageLoaderError';
+import type { RemoteImageMemoryCache } from './RemoteImageCache';
+import { RemoteImageLoaderError } from './RemoteImageLoaderError';
 import request from '@ohos.request';
-import type common from '@ohos.app.ability.common';
-import type {RemoteImageDiskCache} from './RemoteImageDiskCache';
+import type { RemoteImageDiskCache } from './RemoteImageDiskCache';
 import fs from '@ohos.file.fs';
-import {fetchDataFromUrl, FetchResult} from '../RNOH/HttpRequestHelper';
-import {RemoteImageSource} from './RemoteImageSource';
+import { fetchDataFromUrl, FetchResult } from '../RNOH/HttpRequestHelper';
+import { RemoteImageSource } from './RemoteImageSource';
+import { common } from '@kit.AbilityKit';
 
 export class RemoteImageLoader {
   private activeRequestByUrl: Map<string, Promise<FetchResult>> = new Map();
@@ -16,7 +16,8 @@ export class RemoteImageLoader {
     private memoryCache: RemoteImageMemoryCache,
     private diskCache: RemoteImageDiskCache,
     private context: common.UIAbilityContext,
-  ) {}
+  ) {
+  }
 
   private async fetchImage(url: string): Promise<FetchResult> {
     if (this.activeRequestByUrl.has(url)) {
@@ -48,7 +49,8 @@ export class RemoteImageLoader {
     // if the image is being prefetched, wait until it's downloaded,
     // ignoring any errors that occur (we'll try to download it to memory instead)
     if (this.activePrefetchByUrl.has(uri)) {
-      await this.activePrefetchByUrl.get(uri).catch(() => {});
+      await this.activePrefetchByUrl.get(uri).catch(() => {
+      });
     }
 
     if (this.diskCache.has(uri)) {
@@ -149,7 +151,7 @@ export class RemoteImageLoader {
     const path = this.diskCache.getLocation(uri);
 
     try {
-      await request.downloadFile(this.context, {url: uri, filePath: path});
+      await request.downloadFile(this.context, { url: uri, filePath: path });
       this.diskCache.set(uri);
     } catch (e) {
       // request.downloadFile does not allow overwriting,
