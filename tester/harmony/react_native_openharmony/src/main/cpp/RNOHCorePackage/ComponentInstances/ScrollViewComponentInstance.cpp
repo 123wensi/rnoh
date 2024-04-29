@@ -411,8 +411,8 @@ void rnoh::ScrollViewComponentInstance::sendEventForNativeAnimations(
 }
 
 bool ScrollViewComponentInstance::isContentSmallerThanContainer() {
-  return isHorizontal(m_props) ? m_contentSize.width < m_containerSize.width
-                               : m_contentSize.height < m_containerSize.height;
+  return isHorizontal(m_props) ? m_contentSize.width <= m_containerSize.width
+                               : m_contentSize.height <= m_containerSize.height;
 }
 
 bool ScrollViewComponentInstance::isAtEnd(
