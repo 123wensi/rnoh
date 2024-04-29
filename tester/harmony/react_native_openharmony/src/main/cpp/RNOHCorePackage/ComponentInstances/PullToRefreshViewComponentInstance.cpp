@@ -31,10 +31,22 @@ void PullToRefreshViewComponentInstance::onChildRemoved(
 void PullToRefreshViewComponentInstance::onPropsChanged(
     SharedConcreteProps const& props) {
   CppComponentInstance::onPropsChanged(props);
+
+  if (!m_props || m_props->title != props->title ||
+      m_props->titleColor != props->titleColor) {
+    m_loadingProgressNode.createOrUpdateLoadingProgressNodeTitle(
+        props->title, props->titleColor);
+  };
+
+  if (props->rawProps.count("progressBackgroundColor") > 0) {
+    m_loadingProgressNode.updateLoadingProgressBackgroundColor(
+        props->rawProps["progressBackgroundColor"].asInt());
+  };
+
   m_loadingProgressNode.setOffset(0, -props->progressViewOffset);
   m_refreshNode.setNativeRefreshing(props->refreshing);
   if (facebook::react::isColorMeaningful(props->tintColor)) {
-    m_loadingProgressNode.setLoadingProgressNodeColor(props->tintColor);
+    m_loadingProgressNode.updateLoadingSpinnerNodeColor(props->tintColor);
   }
 }
 

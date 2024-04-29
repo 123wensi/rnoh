@@ -16,10 +16,10 @@ void ActivityIndicatorComponentInstance::onPropsChanged(
   auto old = m_props;
   CppComponentInstance::onPropsChanged(props);
   if (!old || props->animating != old->animating) {
-    m_loadingProgressNode.setLoadingProgressNodeAnimating(props->animating);
+    m_loadingProgressNode.setLoadingSpinnerNodeAnimating(props->animating);
   }
   if (props->color && (!old || *(props->color) != *(old->color))) {
-    m_loadingProgressNode.setLoadingProgressNodeColor(props->color);
+    m_loadingProgressNode.updateLoadingSpinnerNodeColor(props->color);
   }
 }
 

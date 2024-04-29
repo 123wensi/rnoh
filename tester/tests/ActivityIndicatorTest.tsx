@@ -7,24 +7,33 @@ import {TestCase} from '../components';
 export function ActivityIndicatorTest() {
   return (
     <TestSuite name="ActivityIndicator">
-      <TestCase.Example itShould="display small, gray and animated loading indicator">
-        <ActivityIndicator />
+      <TestCase.Example
+        tags={['C_API']}
+        itShould="display small, gray and animated loading indicator">
+        <ActivityIndicator style={{marginVertical: 16}} />
       </TestCase.Example>
-      <TestCase.Example itShould="enable and disable loading every 500 ms">
+      <TestCase.Example
+        tags={['C_API']}
+        itShould="enable and disable loading every 500 ms">
         <Interval
           ms={500}
           render={refreshKey => {
-            return <ActivityIndicator animating={refreshKey % 2 === 0} />;
+            return (
+              <ActivityIndicator
+                style={{marginVertical: 16}}
+                animating={refreshKey % 2 === 0}
+              />
+            );
           }}
         />
       </TestCase.Example>
       <TestCase.Example
         tags={['C_API']}
         itShould="display red loading indicator">
-        <ActivityIndicator color={'red'} />
+        <ActivityIndicator style={{marginVertical: 16}} color={'red'} />
       </TestCase.Example>
       <TestCase.Example itShould="display large loading indicator">
-        <ActivityIndicator size="large" />
+        <ActivityIndicator style={{marginVertical: 16}} size="large" />
       </TestCase.Example>
     </TestSuite>
   );

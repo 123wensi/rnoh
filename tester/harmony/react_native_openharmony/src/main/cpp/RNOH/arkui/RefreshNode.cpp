@@ -21,17 +21,6 @@ RefreshNode::~RefreshNode() {
 }
 
 RefreshNode& RefreshNode::setRefreshContent(ArkUINode& refreshContent) {
-  ArkUI_NumberValue widthValue[] = {REFRESH_NODE_SIZE};
-  ArkUI_AttributeItem widthItem = {
-      widthValue, sizeof(widthValue) / sizeof(ArkUI_NumberValue)};
-  maybeThrow(NativeNodeApi::getInstance()->setAttribute(
-      refreshContent.getArkUINodeHandle(), NODE_WIDTH, &widthItem));
-  ArkUI_NumberValue heightValue[] = {REFRESH_NODE_SIZE};
-  ArkUI_AttributeItem heightItem = {
-      heightValue, sizeof(heightValue) / sizeof(ArkUI_NumberValue)};
-  maybeThrow(NativeNodeApi::getInstance()->setAttribute(
-      refreshContent.getArkUINodeHandle(), NODE_HEIGHT, &heightItem));
-
   ArkUI_AttributeItem loadingItem = {
       .object = refreshContent.getArkUINodeHandle()};
   maybeThrow(NativeNodeApi::getInstance()->setAttribute(
@@ -67,10 +56,9 @@ RefreshNode& RefreshNode::setNativeRefreshing(bool isRefreshing) {
 void RefreshNode::onNodeEvent(
     ArkUI_NodeEventType eventType,
     EventArgs& eventArgs) {
-  if (eventType == ArkUI_NodeEventType::NODE_REFRESH_ON_REFRESH) {
-    if (m_refreshNodeDelegate != nullptr) {
-      m_refreshNodeDelegate->onRefresh();
-    }
+  if (eventType == ArkUI_NodeEventType::NODE_REFRESH_ON_REFRESH &&
+      m_refreshNodeDelegate) {
+    m_refreshNodeDelegate->onRefresh();
   }
 }
 } // namespace rnoh

@@ -151,7 +151,9 @@ export const RefreshControlTest = () => {
         modal>
         <RefreshControlInsideFlatListWithStylesExample />
       </TestCase.Example>
-      <TestCase.Example itShould="display background color for refresh control indicator">
+      <TestCase.Example
+        tags={['C_API']}
+        itShould="display background color for refresh control indicator">
         <ScrollView
           style={{height: 128, backgroundColor: 'white'}}
           refreshControl={
@@ -164,6 +166,7 @@ export const RefreshControlTest = () => {
         />
       </TestCase.Example>
       <TestCase.Example
+        tags={['C_API']}
         itShould="display pink 'I am refreshing!' text below refresh control indicator"
         skip={{
           harmony: false,
