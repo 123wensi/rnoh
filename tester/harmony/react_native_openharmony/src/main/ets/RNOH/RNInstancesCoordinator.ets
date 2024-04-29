@@ -190,7 +190,7 @@ export class RNInstancesCoordinator {
   }
 
   public onConfigurationUpdate(systemConfiguration: AbilityConfiguration.Configuration) {
-    this.displayMetricsManager.updateDisplayMetrics()
+    this.displayMetricsManager?.updateDisplayMetrics()
     this.rnInstanceRegistry?.forEach((rnInstance) => rnInstance.onConfigurationUpdate(systemConfiguration))
   }
 
