@@ -17,7 +17,7 @@ export interface Spec extends TurboModule {
     +HEIGHT: number,
     +DEFAULT_BACKGROUND_COLOR: number,
   |};
-  +setColor: (color: string) => void;
+  +setColor: (color: string, animated: boolean) => void;
   +setTranslucent: (translucent: boolean) => void;
 
   /**
@@ -25,8 +25,11 @@ export interface Spec extends TurboModule {
    *    - 'default'
    *    - 'dark-content'
    */
-  +setStyle: (statusBarStyle?: ?string) => void;
-  +setHidden: (hidden: boolean) => void;
+  +setStyle: (statusBarStyle?: ?string, animated: boolean) => void;
+    /**
+   *  - withAnimation can be: 'none' | 'slide'
+   */
+  +setHidden: (hidden: boolean, withAnimation: string) => void;
 }
 
 const NativeModule = TurboModuleRegistry.getEnforcing<Spec>("StatusBarManager");
@@ -43,8 +46,8 @@ const NativeStatusBarManager = {
     return constants;
   },
 
-  setColor(color: number): void {
-    NativeModule.setColor(color);
+  setColor(color: number, animated: boolean): void {
+    NativeModule.setColor(color, animated);
   },
 
   setTranslucent(translucent: boolean): void {
@@ -56,12 +59,12 @@ const NativeStatusBarManager = {
    *    - 'default'
    *    - 'dark-content'
    */
-  setStyle(statusBarStyle?: ?string): void {
-    NativeModule.setStyle(statusBarStyle);
+  setStyle(statusBarStyle?: ?string, animated: boolean): void {
+    NativeModule.setStyle(statusBarStyle, animated);
   },
 
-  setHidden(hidden: boolean): void {
-    NativeModule.setHidden(hidden);
+  setHidden(hidden: boolean, withAnimation: string): void {
+    NativeModule.setHidden(hidden, withAnimation);
   },
 };
 

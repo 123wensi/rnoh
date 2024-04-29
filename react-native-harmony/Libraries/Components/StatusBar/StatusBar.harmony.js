@@ -266,7 +266,7 @@ class StatusBar extends React.Component<Props> {
     animation = animation || "none";
     //RNOH: patch - delete code specific to other platforms
     StatusBar._defaultProps.hidden.value = hidden;
-    NativeStatusBarManagerHarmony.setHidden(hidden);
+    NativeStatusBarManagerHarmony.setHidden(hidden, animation);
   }
 
   /**
@@ -277,7 +277,7 @@ class StatusBar extends React.Component<Props> {
   static setBarStyle(style: StatusBarStyle, animated?: boolean) {
     //RNOH: patch - delete code specific to other platforms
     StatusBar._defaultProps.barStyle.value = style;
-    NativeStatusBarManagerHarmony.setStyle(style);
+    NativeStatusBarManagerHarmony.setStyle(style, animated);
   }
 
   /**
@@ -315,7 +315,7 @@ class StatusBar extends React.Component<Props> {
       "Unexpected color given for StatusBar.setBackgroundColor"
     );
     //RNOH: patch - use harmony NativeStatusBarManager
-    NativeStatusBarManagerHarmony.setColor(processedColor);
+    NativeStatusBarManagerHarmony.setColor(processedColor, animated);
   }
 
   /**
@@ -428,7 +428,7 @@ class StatusBar extends React.Component<Props> {
             typeof processedColor === "number",
             "Unexpected color given in StatusBar._updatePropsStack"
           );
-          NativeStatusBarManagerHarmony.setColor(processedColor);
+          NativeStatusBarManagerHarmony.setColor(processedColor, mergedProps.backgroundColor.animated);
         }
       }
       if (!oldProps || oldProps.hidden.value !== mergedProps.hidden.value) {

@@ -6,14 +6,14 @@ import {TestCase} from '../components';
 export function StatusBarTest() {
   return (
     <TestSuite name="Status bar">
-      <StatusBarView />
+      <StatusBarView animated />
     </TestSuite>
   );
 }
 const STYLES = ['default', 'dark-content', 'light-content'] as const;
 const BACKGROUND_COLORS = ['#FF000088', '#00FF0088'];
 
-function StatusBarView() {
+function StatusBarView({animated}: {animated?: boolean}) {
   const [hidden, setHidden] = useState(false);
   const [backgroundColor, setBackgroundColor] = useState(BACKGROUND_COLORS[0]);
   const [statusBarStyle, setStatusBarStyle] = useState<StatusBarStyle>(
@@ -47,6 +47,7 @@ function StatusBarView() {
   return (
     <View>
       <StatusBar
+        animated={animated}
         backgroundColor={backgroundColor} // 'rgba(200, 0, 0, 0.5)'
         barStyle={statusBarStyle}
         hidden={hidden}
@@ -125,6 +126,41 @@ function StatusBarView() {
             StatusBar.setTranslucent(true);
           }}>
           <Text style={styles.buttonText}>Set translucent</Text>
+        </View>
+      </TestCase.Example>
+      <TestCase.Example
+        tags={['C_API']}
+        itShould="set status bar color to purple with animation (StatusBar.setBackgroundColor)">
+        <View
+          style={styles.button}
+          onTouchEnd={() => {
+            StatusBar.setBackgroundColor('#FF00FF88', true);
+          }}>
+          <Text style={styles.buttonText}>Set purple</Text>
+        </View>
+      </TestCase.Example>
+      <TestCase.Example
+        tags={['C_API']}
+        skip="This test is skipped because the API is not available in the current version of OpenHarmony"
+        itShould="set status bar dark style with animation (light-content(default)/dark-content) (StatusBar.setBarStyle) ">
+        <View
+          style={styles.button}
+          onTouchEnd={() => {
+            StatusBar.setBarStyle('dark-content', true);
+          }}>
+          <Text style={styles.buttonText}>Set dark-content</Text>
+        </View>
+      </TestCase.Example>
+      <TestCase.Example
+        tags={['C_API']}
+        skip="This test is skipped because the API is not available in the current version of OpenHarmony"
+        itShould="set status bar color to hidden with animation (StatusBar.setHidden)">
+        <View
+          style={styles.button}
+          onTouchEnd={() => {
+            StatusBar.setHidden(true, 'slide');
+          }}>
+          <Text style={styles.buttonText}>Set hidden</Text>
         </View>
       </TestCase.Example>
       <TestCase.Logical
