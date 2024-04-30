@@ -12,7 +12,7 @@ import {MomentumCallbacksTest} from './MomentumCallbacksTest';
 import {KeyboardTest} from './KeyboardTest';
 import {MiscPropsTest} from './MiscPropsTest';
 import {ScrollToTest} from './ScrollToTest';
-import {CenterContentTest } from './CenterContentTest';
+import {CenterContentTest} from './CenterContentTest';
 
 export function ScrollViewTest() {
   return (
@@ -27,7 +27,7 @@ export function ScrollViewTest() {
       <KeyboardTest />
       <ScrollToTest />
       <MiscPropsTest />
-      <CenterContentTest/>
+      <CenterContentTest />
       <TestCase
         modal
         itShould="maintain scroll position when adding/removing elements">

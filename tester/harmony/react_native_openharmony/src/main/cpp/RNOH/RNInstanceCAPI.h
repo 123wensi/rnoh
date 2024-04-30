@@ -96,16 +96,15 @@ class RNInstanceCAPI : public RNInstanceInternal,
     if (this->unsubscribeUITickListener != nullptr) {
       unsubscribeUITickListener();
     }
-    taskExecutor->runSyncTask(
-        TaskThread::JS, [this] {
-          for (auto& [_tag, surfaceHandler] : surfaceHandlers) {
-            if (surfaceHandler->getStatus() ==
-                facebook::react::SurfaceHandler::Status::Running) {
-              surfaceHandler->stop();
-            }
-            scheduler->unregisterSurface(*surfaceHandler);
-          }
-        });
+    taskExecutor->runSyncTask(TaskThread::JS, [this] {
+      for (auto& [_tag, surfaceHandler] : surfaceHandlers) {
+        if (surfaceHandler->getStatus() ==
+            facebook::react::SurfaceHandler::Status::Running) {
+          surfaceHandler->stop();
+        }
+        scheduler->unregisterSurface(*surfaceHandler);
+      }
+    });
     DLOG(INFO) << "~RNInstanceCAPI::stop";
   }
 

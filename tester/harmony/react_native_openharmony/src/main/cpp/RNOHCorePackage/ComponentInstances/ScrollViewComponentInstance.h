@@ -100,5 +100,6 @@ class ScrollViewComponentInstance
   void updateStateWithContentOffset(facebook::react::Point contentOffset);
   bool isContentSmallerThanContainer();
   bool isAtEnd(facebook::react::Point currentOffset);
+  facebook::react::Point getContentViewOffset() const;
 };
 } // namespace rnoh

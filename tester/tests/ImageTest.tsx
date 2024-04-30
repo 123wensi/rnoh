@@ -103,7 +103,7 @@ export const ImageTest = () => {
           return new Promise((resolve, reject) => {
             Image.getSizeWithHeaders(
               BASE64_IMAGE_STRING,
-              {crossOrigin:'use-credentials'},
+              {crossOrigin: 'use-credentials'},
               (width, height) => {
                 expect(width).to.be.eq(10);
                 expect(height).to.be.eq(10);
@@ -122,7 +122,7 @@ export const ImageTest = () => {
           return new Promise((resolve, reject) => {
             Image.getSizeWithHeaders(
               REMOTE_IMAGE_URL,
-              {referrerPolicy:'no-referrer-when-downgrad'},
+              {referrerPolicy: 'no-referrer-when-downgrad'},
               (width, height) => {
                 expect(width).to.be.eq(100);
                 expect(height).to.be.eq(100);

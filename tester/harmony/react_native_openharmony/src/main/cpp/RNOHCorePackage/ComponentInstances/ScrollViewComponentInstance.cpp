@@ -99,10 +99,10 @@ void rnoh::ScrollViewComponentInstance::onPropsChanged(
   }
 
   if (!m_props || props->centerContent != m_props->centerContent) {
-    if (props->centerContent == 1 && isContentSmallerThanContainer()) {
+    if (props->centerContent) {
       m_scrollNode.setCenterContent(true);
-    }else{
-      m_scrollNode.setCenterContent(false);       
+    } else {
+      m_scrollNode.setCenterContent(false);
     }
   }
 
@@ -141,7 +141,9 @@ facebook::react::Point rnoh::ScrollViewComponentInstance::computeChildPoint(
     facebook::react::Point const& point,
     TouchTarget::Shared const& child) const {
   auto offset = m_scrollNode.getScrollOffset();
-  return CppComponentInstance::computeChildPoint(point + offset, child);
+  auto contentViewOffset = getContentViewOffset();
+  return CppComponentInstance::computeChildPoint(
+      point + offset - contentViewOffset, child);
 }
 
 void rnoh::ScrollViewComponentInstance::updateStateWithContentOffset(
@@ -484,6 +486,20 @@ std::optional<float> ScrollViewComponentInstance::getNextSnapTarget() {
     nextSnapTarget = static_cast<float>(intervalIndex * interval);
   }
   return nextSnapTarget;
+}
+
+facebook::react::Point ScrollViewComponentInstance::getContentViewOffset()
+    const {
+  facebook::react::Point contentViewOffset = {0, 0};
+  if (m_props->centerContent) {
+    if (m_contentSize.width < m_containerSize.width) {
+      contentViewOffset.x = (m_containerSize.width - m_contentSize.width) / 2;
+    }
+    if (m_contentSize.height < m_containerSize.height) {
+      contentViewOffset.y = (m_containerSize.height - m_contentSize.height) / 2;
+    }
+  }
+  return contentViewOffset;
 }
 
 } // namespace rnoh
