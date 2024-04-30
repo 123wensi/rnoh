@@ -43,16 +43,6 @@ void StackNode::onClick() {
   }
 }
 
-StackNode&
-StackNode::setMargin(float left, float top, float right, float bottom) {
-  ArkUI_NumberValue value[] = {
-      {.f32 = top}, {.f32 = right}, {.f32 = bottom}, {.f32 = left}};
-  ArkUI_AttributeItem item = {value, sizeof(value) / sizeof(ArkUI_NumberValue)};
-  maybeThrow(NativeNodeApi::getInstance()->setAttribute(
-      m_nodeHandle, NODE_MARGIN, &item));
-  return *this;
-}
-
 StackNode::~StackNode() {
   NativeNodeApi::getInstance()->unregisterNodeEvent(
       m_nodeHandle, NODE_ON_CLICK);

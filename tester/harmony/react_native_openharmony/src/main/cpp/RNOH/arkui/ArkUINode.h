@@ -45,6 +45,8 @@ class ArkUINode {
 
   virtual ArkUINode& setPosition(facebook::react::Point const& position);
   virtual ArkUINode& setSize(facebook::react::Size const& size);
+  virtual ArkUINode& setHeight(float height);
+  virtual ArkUINode& setWidth(float width);
   virtual ArkUINode& setBorderWidth(
       facebook::react::BorderWidths const& borderWidths);
   virtual ArkUINode& setBorderColor(
@@ -58,6 +60,7 @@ class ArkUINode {
   virtual ArkUINode& setTransform(
       facebook::react::Transform const& transform,
       facebook::react::Float pointScaleFactor);
+  virtual ArkUINode& setTranslate(float x, float y, float z = 0.0f);
   virtual ArkUINode& setShadow(
       facebook::react::SharedColor const& shadowColor,
       facebook::react::Size const& shadowOffset,
@@ -86,6 +89,11 @@ class ArkUINode {
   virtual ArkUINode& setOffset(float x, float y);
   virtual ArkUINode& setEnabled(bool enabled);
   virtual ArkUINode& setFocusStatus(int32_t focus);
+  virtual ArkUINode&
+  setMargin(float left, float top, float right, float bottom);
+  virtual ArkUINode&
+  setPadding(float left, float top, float right, float bottom);
+  virtual ArkUINode& setVisibility(ArkUI_Visibility visibility);
 
   virtual ArkUINode& resetAccessibilityText();
 

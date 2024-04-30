@@ -66,6 +66,25 @@ ArkUINode& ArkUINode::setSize(facebook::react::Size const& size) {
   return *this;
 }
 
+ArkUINode& ArkUINode::setHeight(float height) {
+  ArkUI_NumberValue heightValue[] = {{.f32 = height}};
+  ArkUI_AttributeItem heightItem = {
+      heightValue, sizeof(heightValue) / sizeof(ArkUI_NumberValue)};
+
+  maybeThrow(NativeNodeApi::getInstance()->setAttribute(
+      m_nodeHandle, NODE_HEIGHT, &heightItem));
+  return *this;
+}
+
+ArkUINode& ArkUINode::setWidth(float width) {
+  ArkUI_NumberValue widthValue[] = {{.f32 = width}};
+  ArkUI_AttributeItem widthItem = {
+      widthValue, sizeof(widthValue) / sizeof(ArkUI_NumberValue)};
+
+  maybeThrow(NativeNodeApi::getInstance()->setAttribute(
+      m_nodeHandle, NODE_WIDTH, &widthItem));
+}
+
 ArkUINode& ArkUINode::setBorderWidth(
     facebook::react::BorderWidths const& borderWidths) {
   facebook::react::BorderWidths borderWidth;
@@ -294,6 +313,15 @@ ArkUINode& ArkUINode::setTransform(
   return *this;
 }
 
+ArkUINode& ArkUINode::setTranslate(float x, float y, float z) {
+  ArkUI_NumberValue translateValue[] = {{.f32 = x}, {.f32 = y}, {.f32 = z}};
+  ArkUI_AttributeItem translateItem = {
+      translateValue, sizeof(translateValue) / sizeof(ArkUI_NumberValue)};
+  maybeThrow(NativeNodeApi::getInstance()->setAttribute(
+      m_nodeHandle, NODE_TRANSLATE, &translateItem));
+  return *this;
+}
+
 ArkUINode& ArkUINode::setOpacity(facebook::react::Float opacity) {
   ArkUI_NumberValue opacityValue[] = {{.f32 = (float)opacity}};
   ArkUI_AttributeItem opacityItem = {
@@ -401,6 +429,34 @@ ArkUINode& ArkUINode::setFocusStatus(int32_t focus) {
   ArkUI_AttributeItem item = {value.data(), value.size()};
   maybeThrow(NativeNodeApi::getInstance()->setAttribute(
       m_nodeHandle, NODE_FOCUS_STATUS, &item));
+  return *this;
+}
+
+ArkUINode&
+ArkUINode::setMargin(float left, float top, float right, float bottom) {
+  ArkUI_NumberValue value[] = {
+      {.f32 = top}, {.f32 = right}, {.f32 = bottom}, {.f32 = left}};
+  ArkUI_AttributeItem item = {value, sizeof(value) / sizeof(ArkUI_NumberValue)};
+  maybeThrow(NativeNodeApi::getInstance()->setAttribute(
+      m_nodeHandle, NODE_MARGIN, &item));
+  return *this;
+}
+
+ArkUINode&
+ArkUINode::setPadding(float left, float top, float right, float bottom) {
+  ArkUI_NumberValue value[] = {
+      {.f32 = top}, {.f32 = right}, {.f32 = bottom}, {.f32 = left}};
+  ArkUI_AttributeItem item = {.value = value, .size = 4};
+  maybeThrow(NativeNodeApi::getInstance()->setAttribute(
+      m_nodeHandle, NODE_PADDING, &item));
+  return *this;
+}
+
+ArkUINode& ArkUINode::setVisibility(ArkUI_Visibility visibility) {
+  ArkUI_NumberValue value[] = {{.i32 = visibility}};
+  ArkUI_AttributeItem item = {value, sizeof(value) / sizeof(ArkUI_NumberValue)};
+  maybeThrow(NativeNodeApi::getInstance()->setAttribute(
+      m_nodeHandle, NODE_VISIBILITY, &item));
   return *this;
 }
 
