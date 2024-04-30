@@ -96,6 +96,45 @@ export const ImageTest = () => {
           });
         }}
       />
+      <TestCase.Logical
+        tags={['C_API']}
+        itShould="retrieve base64 image size"
+        fn={({expect}) => {
+          return new Promise((resolve, reject) => {
+            Image.getSizeWithHeaders(
+              BASE64_IMAGE_STRING,
+              {crossOrigin:'use-credentials'},
+              (width, height) => {
+                expect(width).to.be.eq(10);
+                expect(height).to.be.eq(10);
+                resolve();
+              },
+              e => {
+                reject(e);
+              },
+            );
+          });
+        }}
+      />
+      <TestCase.Logical
+        itShould="retrieve remote image size"
+        fn={({expect}) => {
+          return new Promise((resolve, reject) => {
+            Image.getSizeWithHeaders(
+              REMOTE_IMAGE_URL,
+              {referrerPolicy:'no-referrer-when-downgrad'},
+              (width, height) => {
+                expect(width).to.be.eq(100);
+                expect(height).to.be.eq(100);
+                resolve();
+              },
+              e => {
+                reject(e);
+              },
+            );
+          });
+        }}
+      />
       <FileExampleCase />
       <TestCase.Logical
         itShould="retrieve local image size"

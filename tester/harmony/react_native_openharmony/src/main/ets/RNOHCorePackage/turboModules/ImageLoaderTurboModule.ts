@@ -30,12 +30,24 @@ export class ImageLoaderTurboModule extends TurboModule {
     return [imageInfo.size.width, imageInfo.size.height]
   }
 
-  public getSizeWithHeaders(uri: string, headers: Object): Promise<{
+  public async getSizeWithHeaders(uri: string, headers: Object): Promise<{
     width: number,
     height: number
   } & Record<string, any>> {
-    this.ctx.logger.warn("ImageLoader::getSizeWithHeaders is not supported")
-    return Promise.resolve({ width: 0, height: 0 })
+    let srcHeaders = headers as Record<string, any>
+    let destHeaders: Record<string, any> = {}
+
+    if (srcHeaders['crossOrigin'] === 'use-credentials') {
+      destHeaders['Access-Control-Allow-Credentials'] = 'true'
+    }
+
+    if (srcHeaders['referrerPolicy'] !== undefined) {
+      destHeaders['Referrer-Policy'] = srcHeaders['referrerPolicy']
+    }
+
+    const imageSource = await this.imageLoader.getImageSource(uri, destHeaders)
+    const imageInfo = await imageSource.getImageSource().getImageInfo()
+    return Promise.resolve({ width: imageInfo.size.width, height: imageInfo.size.height})
   }
 
   public async prefetchImage(uri: string): Promise<boolean> {

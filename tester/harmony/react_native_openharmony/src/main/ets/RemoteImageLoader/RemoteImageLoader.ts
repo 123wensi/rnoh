@@ -4,7 +4,7 @@ import { RemoteImageLoaderError } from './RemoteImageLoaderError';
 import request from '@ohos.request';
 import type { RemoteImageDiskCache } from './RemoteImageDiskCache';
 import fs from '@ohos.file.fs';
-import { fetchDataFromUrl, FetchResult } from '../RNOH/HttpRequestHelper';
+import { fetchDataFromUrl, FetchOptions, FetchResult } from '../RNOH/HttpRequestHelper';
 import { RemoteImageSource } from './RemoteImageSource';
 import { common } from '@kit.AbilityKit';
 
@@ -19,12 +19,16 @@ export class RemoteImageLoader {
   ) {
   }
 
-  private async fetchImage(url: string): Promise<FetchResult> {
+  private async fetchImage(url: string, headers?: Record<string, any>): Promise<FetchResult> {
     if (this.activeRequestByUrl.has(url)) {
       return this.activeRequestByUrl.get(url);
     }
 
-    const promise = fetchDataFromUrl(url);
+    let options: FetchOptions = {
+      usingCache: true,
+      headers: headers,
+    };
+    const promise = fetchDataFromUrl(url, options);
     this.activeRequestByUrl.set(url, promise);
     promise.finally(() => {
       this.activeRequestByUrl.delete(url);
@@ -37,7 +41,7 @@ export class RemoteImageLoader {
     return await imageSource.getPixelMapPromise();
   }
 
-  public async getImageSource(uri: string): Promise<RemoteImageSource> {
+  public async getImageSource(uri: string, headers?: Record<string, any>): Promise<RemoteImageSource> {
     if (uri.startsWith("data:")) {
       const imageSource = image.createImageSource(uri);
       return new RemoteImageSource(imageSource, '');
@@ -66,7 +70,7 @@ export class RemoteImageLoader {
 
     let response: FetchResult;
     try {
-      response = await this.fetchImage(uri);
+      response = await this.fetchImage(uri, headers);
     } catch (e) {
       throw new RemoteImageLoaderError(
         e.message ?? 'Failed to fetch the image',
