@@ -183,6 +183,9 @@ export class RNInstancesCoordinator {
     this.rnInstanceRegistry.forEach(instance => instance.onBackground())
   }
 
+  public onWindowStageChange(windowStageEvent: window.WindowStageEventType) {
+    this.rnInstanceRegistry.forEach((rnInstance) => rnInstance.onWindowStageChange(windowStageEvent))
+  }
 
   public onWindowSizeChange(windowSize: window.Size) {
     this.displayMetricsManager.updateWindowSize(windowSize);

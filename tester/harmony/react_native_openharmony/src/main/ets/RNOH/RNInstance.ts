@@ -48,6 +48,11 @@ export type LifecycleEventArgsByEventName = {
   WINDOW_SIZE_CHANGE: [windowSize: window.Size];
 }
 
+export type StageChangeEventArgsByEventName = {
+  APP_STATE_FOCUS: [];
+  APP_STATE_BLUR: [];
+}
+
 
 export type BundleExecutionStatus = "RUNNING" | "DONE"
 
@@ -91,6 +96,10 @@ export interface RNInstance {
   subscribeToLifecycleEvents: <TEventName extends keyof LifecycleEventArgsByEventName>(
     eventName: TEventName,
     listener: (...args: LifecycleEventArgsByEventName[TEventName]) => void
+  ) => () => void;
+  subscribeToStageChangeEvents: <TEventName extends keyof StageChangeEventArgsByEventName>(
+    eventName: TEventName,
+    listener: (...args: StageChangeEventArgsByEventName[TEventName]) => void
   ) => () => void;
 
   callRNFunction(moduleName: string, functionName: string, args: unknown[]): void;
@@ -163,7 +172,8 @@ export class RNInstanceImpl implements RNInstance {
   public descriptorRegistry: DescriptorRegistry;
   public componentCommandHub: RNComponentCommandHub;
   public componentManagerRegistry: ComponentManagerRegistry;
-  public lifecycleEventEmitter = new EventEmitter<LifecycleEventArgsByEventName>()
+  public lifecycleEventEmitter = new EventEmitter<LifecycleEventArgsByEventName>();
+  public stageEventEmitter = new EventEmitter<StageChangeEventArgsByEventName>();
   public cppEventEmitter = new EventEmitter<Record<string, unknown[]>>()
   public httpClient: HttpClient;
   private componentNameByDescriptorType = new Map<string, string>()
@@ -221,7 +231,8 @@ export class RNInstanceImpl implements RNInstance {
   public onCreate() {
     this.componentManagerRegistry = new ComponentManagerRegistry(this.injectedLogger);
     this.componentCommandHub = new RNComponentCommandHub();
-    this.responderLockDispatcher = new ResponderLockDispatcher(this.componentManagerRegistry, this.componentCommandHub, this.injectedLogger)
+    this.responderLockDispatcher =
+      new ResponderLockDispatcher(this.componentManagerRegistry, this.componentCommandHub, this.injectedLogger)
     this.subscribeToDevTools();
   }
 
@@ -358,7 +369,8 @@ export class RNInstanceImpl implements RNInstance {
     const result = {
       descriptorWrapperFactoryByDescriptorType: packages.reduce((acc, pkg) => {
         const descriptorWrapperFactoryByDescriptorType = pkg.createDescriptorWrapperFactoryByDescriptorType({})
-        for (const [descriptorType, descriptorWrapperFactory] of Object.entries(descriptorWrapperFactoryByDescriptorType)) {
+        for (const [descriptorType, descriptorWrapperFactory]
+          of Object.entries(descriptorWrapperFactoryByDescriptorType)) {
           acc.set(descriptorType, descriptorWrapperFactory)
         }
         return acc
@@ -382,9 +394,17 @@ export class RNInstanceImpl implements RNInstance {
     return result
   }
 
-  public subscribeToLifecycleEvents<TEventName extends keyof LifecycleEventArgsByEventName>(type: TEventName, listener: (...args: LifecycleEventArgsByEventName[TEventName]) => void) {
+  public subscribeToLifecycleEvents<TEventName extends keyof LifecycleEventArgsByEventName>(type: TEventName,
+    listener: (...args: LifecycleEventArgsByEventName[TEventName]) => void) {
     return this.lifecycleEventEmitter.subscribe(type, listener)
   }
+
+  public subscribeToStageChangeEvents<TEventName extends keyof StageChangeEventArgsByEventName>(
+    eventName: TEventName,
+    listener: (...args: StageChangeEventArgsByEventName[TEventName]) => void
+  ): (() => void) {
+    return this.stageEventEmitter.subscribe(eventName, listener);
+  };
 
   public getLifecycleState(): LifecycleState {
     return this.lifecycleState
@@ -420,17 +440,20 @@ export class RNInstanceImpl implements RNInstance {
     const bundleURL = jsBundleProvider.getURL()
     const isMetroServer = jsBundleProvider.getHotReloadConfig() !== null
     try {
-      this.devToolsController.eventEmitter.emit("SHOW_DEV_LOADING_VIEW", this.id, `Loading from ${jsBundleProvider.getHumanFriendlyURL()}...`)
+      this.devToolsController.eventEmitter.emit("SHOW_DEV_LOADING_VIEW", this.id,
+        `Loading from ${jsBundleProvider.getHumanFriendlyURL()}...`)
       this.bundleExecutionStatusByBundleURL.set(bundleURL, "RUNNING")
       const jsBundle = await jsBundleProvider.getBundle((progress) => {
-        this.devToolsController.eventEmitter.emit("SHOW_DEV_LOADING_VIEW", this.id, `Loading from ${jsBundleProvider.getHumanFriendlyURL()} (${Math.round(progress * 100)}%)`)
+        this.devToolsController.eventEmitter.emit("SHOW_DEV_LOADING_VIEW", this.id,
+          `Loading from ${jsBundleProvider.getHumanFriendlyURL()} (${Math.round(progress * 100)}%)`)
       })
       this.initialBundleUrl = this.initialBundleUrl ?? jsBundleProvider.getURL()
       await this.napiBridge.loadScript(this.id, jsBundle, bundleURL)
       this.lifecycleState = LifecycleState.READY
       const hotReloadConfig = jsBundleProvider.getHotReloadConfig()
       if (hotReloadConfig) {
-        this.callRNFunction("HMRClient", "setup", ["harmony", hotReloadConfig.bundleEntry, hotReloadConfig.host, hotReloadConfig.port, true])
+        this.callRNFunction("HMRClient", "setup",
+          ["harmony", hotReloadConfig.bundleEntry, hotReloadConfig.host, hotReloadConfig.port, true])
         this.logger.info("Configured hot reloading")
       }
       const isRemoteBundle = bundleURL.startsWith("http")
@@ -471,7 +494,8 @@ export class RNInstanceImpl implements RNInstance {
   public createSurface(appKey: string): SurfaceHandle {
     const stopTracing = this.logger.clone("createSurface").startTracing()
     const tag = this.getNextSurfaceTag();
-    const result = new SurfaceHandle(this, tag, appKey, this.defaultProps, this.napiBridge, (handle) => this.surfaceHandles.delete(handle));
+    const result = new SurfaceHandle(this, tag, appKey, this.defaultProps, this.napiBridge,
+      (handle) => this.surfaceHandles.delete(handle));
     this.surfaceHandles.add(result)
     stopTracing()
     return result
@@ -504,6 +528,14 @@ export class RNInstanceImpl implements RNInstance {
   public onWindowSizeChange(windowSize: window.Size) {
     this.lifecycleEventEmitter.emit("WINDOW_SIZE_CHANGE", windowSize);
     this.postMessageToCpp("WINDOW_SIZE_CHANGE", windowSize);
+  }
+
+  public onWindowStageChange(windowStageEvent: window.WindowStageEventType) {
+    if (windowStageEvent == window.WindowStageEventType.ACTIVE) {
+      this.stageEventEmitter.emit("APP_STATE_FOCUS");
+    } else if (windowStageEvent == window.WindowStageEventType.INACTIVE) {
+      this.stageEventEmitter.emit("APP_STATE_BLUR");
+    }
   }
 
   private getNextSurfaceTag(): Tag {
