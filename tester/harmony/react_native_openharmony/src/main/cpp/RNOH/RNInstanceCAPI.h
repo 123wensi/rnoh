@@ -96,15 +96,8 @@ class RNInstanceCAPI : public RNInstanceInternal,
     if (this->unsubscribeUITickListener != nullptr) {
       unsubscribeUITickListener();
     }
-    // synchronization primitives used to ensure all tasks currently in queue
-    // run before this destructor returns. This ensures the tasks scheduled by
-    // this object are not running after the object is destroyed.
-    std::mutex surfacesUnregisteredMutex;
-    std::condition_variable cv;
-    std::unique_lock lock(surfacesUnregisteredMutex);
-    taskExecutor->runTask(
-        TaskThread::JS, [this, &cv, &surfacesUnregisteredMutex] {
-          std::unique_lock lock(surfacesUnregisteredMutex);
+    taskExecutor->runSyncTask(
+        TaskThread::JS, [this] {
           for (auto& [_tag, surfaceHandler] : surfaceHandlers) {
             if (surfaceHandler->getStatus() ==
                 facebook::react::SurfaceHandler::Status::Running) {
@@ -112,12 +105,7 @@ class RNInstanceCAPI : public RNInstanceInternal,
             }
             scheduler->unregisterSurface(*surfaceHandler);
           }
-          cv.notify_one();
         });
-    // block until the task has finished running,
-    // to ensure that the instance is not destroyed before all surface are
-    // unregistered
-    cv.wait(lock);
     DLOG(INFO) << "~RNInstanceCAPI::stop";
   }
 
