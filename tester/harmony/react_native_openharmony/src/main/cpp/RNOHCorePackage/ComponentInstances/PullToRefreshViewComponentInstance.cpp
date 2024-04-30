@@ -48,6 +48,13 @@ void PullToRefreshViewComponentInstance::onPropsChanged(
   if (facebook::react::isColorMeaningful(props->tintColor)) {
     m_loadingProgressNode.updateLoadingSpinnerNodeColor(props->tintColor);
   }
+  if (props->rawProps.count("enabled") > 0) {
+    if (props->rawProps["enabled"].isBool()) {
+      m_refreshNode.setEnabled(props->rawProps["enabled"].asBool());
+    } else {
+      m_refreshNode.setEnabled(true);
+    }
+  }
 }
 
 void PullToRefreshViewComponentInstance::onRefresh() {

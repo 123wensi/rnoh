@@ -11,6 +11,7 @@ class PullToRefreshViewJSIBinder : public ViewComponentJSIBinder {
     nativeProps.setProperty(rt, "tintColor", "Color");
     nativeProps.setProperty(rt, "title", "string");
     nativeProps.setProperty(rt, "titleColor", "Color");
+    nativeProps.setProperty(rt, "enabled", "boolean");
     return nativeProps;
   }
   facebook::jsi::Object createDirectEventTypes(
