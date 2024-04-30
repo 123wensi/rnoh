@@ -1,5 +1,35 @@
 # Changelog
 
+## v0.72.24
+- added: setHeight/setWidth/setTranslate/setMargin/setPadding/setVisibility in ArkUINode ([7bb94f9db7](https://gl.swmansion.com/rnoh/react-native-harmony/-/commit/7bb94f9db76ff3bedc6be78b79cccacfaed708b4))
+- added support for `RefreshControl::enabled` ([4bbecc3810](https://gl.swmansion.com/rnoh/react-native-harmony/-/commit/4bbecc38105f2e7898f95d4f77483e8d52bdc721))
+- added onWindowStageChange in RNAbility ([51cf9aaf61](https://gl.swmansion.com/rnoh/react-native-harmony/-/commit/51cf9aaf617994ddf43bbccb47a786b5ca135860))
+- added StageChangeEventArgsByEventName in RNInstance ([51cf9aaf61](https://gl.swmansion.com/rnoh/react-native-harmony/-/commit/51cf9aaf617994ddf43bbccb47a786b5ca135860))
+- added onWindowStageChange in RNInstancesCoordinator ([51cf9aaf61](https://gl.swmansion.com/rnoh/react-native-harmony/-/commit/51cf9aaf617994ddf43bbccb47a786b5ca135860))
+- added listeners in AppStateTurboModule ([51cf9aaf61](https://gl.swmansion.com/rnoh/react-native-harmony/-/commit/51cf9aaf617994ddf43bbccb47a786b5ca135860))
+- added ArkUI properties (enableStatusBarAnimations) but they are not working yet ([f9262857e9](https://gl.swmansion.com/rnoh/react-native-harmony/-/commit/f9262857e96568f80ab4567b05ca29ab7e0058bf))
+- added support for `progressBackgroundColor`, `title` and `titleColor` for `RefreshControl` in C-API architecture ([49fd649b4f](https://gl.swmansion.com/rnoh/react-native-harmony/-/commit/49fd649b4f05925bf32311b9e3e8a359d12f06a3))
+- added null check into onConfigurationUpdate() ([fb172fb9d7](https://gl.swmansion.com/rnoh/react-native-harmony/-/commit/fb172fb9d7efc8156231da19c6a3cdc744eb2b81))
+- added HttpClient ([8a1bc5fab8](https://gl.swmansion.com/rnoh/react-native-harmony/-/commit/8a1bc5fab8758395248550002572e0b8e930b19d))
+- added `Modal::onOrientationChange` ([e28f54a321](https://gl.swmansion.com/rnoh/react-native-harmony/-/commit/e28f54a321f2cab1229a6b5d61dacd408c66011f))
+- added NODE_TEXT_WORD_BREAK support  ([0e07813df7](https://gl.swmansion.com/rnoh/react-native-harmony/-/commit/0e07813df70fb367ed07234d17ddaa4e448f3cdc))
+- added support for `TextInput::selectTextOnFocus` ([92ae1e1eb9](https://gl.swmansion.com/rnoh/react-native-harmony/-/commit/92ae1e1eb91c1e96098f2c4e572404ba609bea2d))
+- added support for `TextInput::selection` in multiline ([92ae1e1eb9](https://gl.swmansion.com/rnoh/react-native-harmony/-/commit/92ae1e1eb91c1e96098f2c4e572404ba609bea2d))
+- added full support for `TextInput::onKeyPress` in multiline ([92ae1e1eb9](https://gl.swmansion.com/rnoh/react-native-harmony/-/commit/92ae1e1eb91c1e96098f2c4e572404ba609bea2d))
+- added test for ToastAndroid duration constants ([f857f1e73f](https://gl.swmansion.com/rnoh/react-native-harmony/-/commit/f857f1e73f5fa891032a681633792be99d344147))
+- fixed the Scroll bouncing back on first scroll when nested in another Scroll. ([1d24eddbcb](https://gl.swmansion.com/rnoh/react-native-harmony/-/commit/1d24eddbcba1fd50d6b26a6bf5b7525c98f2ad6a))
+- fixed animated views jittering when they are rerendered by React ([934d5d237e](https://gl.swmansion.com/rnoh/react-native-harmony/-/commit/934d5d237e9b57062dc6177b8b2787f198a441b2))
+- fixed issue with 0-sized views being incorrectly positioned by ArkUI ([499613f907](https://gl.swmansion.com/rnoh/react-native-harmony/-/commit/499613f90756a4f2680b67b19d7fc1400002e098))
+- fixed touches for non-ASCII text fragments ([644e022fcd](https://gl.swmansion.com/rnoh/react-native-harmony/-/commit/644e022fcd443c23a2c9f89c62ebcd1b05d6d4f7))
+- fixed deadlock when trying to `postMessageToCpp` from a `cppEventEmitter` listener ([8ca81da316](https://gl.swmansion.com/rnoh/react-native-harmony/-/commit/8ca81da3160bfc6a1e23a3731f02a3dea1bbb0dc))
+- changed `ScrollView` child point calculation to take into account content centering ([b44780cfe9](https://gl.swmansion.com/rnoh/react-native-harmony/-/commit/b44780cfe96dc2dde3f5e8d5b6c241927f681ae9))
+- changed `Modal` display size to rely on window size rather than screen size to allow proper display in split screen mode ([e28f54a321](https://gl.swmansion.com/rnoh/react-native-harmony/-/commit/e28f54a321f2cab1229a6b5d61dacd408c66011f))
+- removed setMargin in StackNode ([7bb94f9db7](https://gl.swmansion.com/rnoh/react-native-harmony/-/commit/7bb94f9db76ff3bedc6be78b79cccacfaed708b4))
+- updated ~RNInstanceCAPI thread-related codes ([bd729ca9f5](https://gl.swmansion.com/rnoh/react-native-harmony/-/commit/bd729ca9f553008462f52cf22b59f1eb1190dcf5))
+- manually setting color in StatusBar inside setInterval function (similar to Android implementation) ([f9262857e9](https://gl.swmansion.com/rnoh/react-native-harmony/-/commit/f9262857e96568f80ab4567b05ca29ab7e0058bf))
+- implemented progressOffsetView of ArkUI Architecture ([48fca87ec0](https://gl.swmansion.com/rnoh/react-native-harmony/-/commit/48fca87ec056b046551b78f876a57f5bb662781b))
+
+
 ## v0.72.23
 - added Image's `loadingIndicatorSource` support in both architectures ([32787795ca](https://gl.swmansion.com/rnoh/react-native-harmony/-/commit/32787795ca075b1fe25e9807924fbb7c1e5304b3))
 - fixed har file not being included in the npm package ([f5e07d7791](https://gl.swmansion.com/rnoh/react-native-harmony/-/commit/f5e07d77916ab593af7a83dbc17b88d57cd6d3e8))

@@ -4,7 +4,7 @@
   "description": "Sample RN harmony package",
   "main": "index.ts",
   "scripts": {
-    "install:rn_harmony": "cd ../react-native-harmony && npm pack && cd ../react-native-harmony-sample-package && npm uninstall react-native-harmony && npm i react-native-harmony@file:../react-native-harmony/rnoh-react-native-harmony-0.72.23.tgz",
+    "install:rn_harmony": "cd ../react-native-harmony && npm pack && cd ../react-native-harmony-sample-package && npm uninstall react-native-harmony && npm i react-native-harmony@file:../react-native-harmony/rnoh-react-native-harmony-0.72.24.tgz",
     "prepack": "npm i && echo 'when packing actual package run: npm run pack:harmony'",
     "pack:harmony": "react-native pack-harmony --oh-module-path ../tester/harmony/sample_package --harmony-dir-path ./harmony --package-json-path ./package.json"
   },
