@@ -71,7 +71,8 @@ class RNInstanceInternal : public RNInstance,
       float height,
       float viewportOffsetX,
       float viewportOffsetY,
-      float pixelRatio) = 0;
+      float pixelRatio,
+      bool isRTL) = 0;
   virtual void startSurface(
       facebook::react::Tag surfaceId,
       float width,
@@ -79,6 +80,7 @@ class RNInstanceInternal : public RNInstance,
       float viewportOffsetX,
       float viewportOffsetY,
       float pixelRatio,
+      bool isRTL,
       folly::dynamic&& initialProps) = 0;
   virtual void setSurfaceProps(
       facebook::react::Tag surfaceId,

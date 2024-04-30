@@ -31,6 +31,16 @@
         .callAsync(rt, #name, args, count);            \
   }
 
+#define ARK_SCHEDULE_METHOD_CALLER(name)        \
+  [](facebook::jsi::Runtime& rt,                \
+     facebook::react::TurboModule& turboModule, \
+     const facebook::jsi::Value* args,          \
+     size_t count) {                            \
+    static_cast<ArkTSTurboModule&>(turboModule) \
+        .scheduleCall(rt, #name, args, count);  \
+    return facebook::jsi::Value::undefined();   \
+  }
+
 #define ARK_METHOD_METADATA(name, argc)      \
   {                                          \
 #name, { argc, ARK_METHOD_CALLER(name) } \
@@ -39,6 +49,11 @@
 #define ARK_ASYNC_METHOD_METADATA(name, argc)      \
   {                                                \
 #name, { argc, ARK_ASYNC_METHOD_CALLER(name) } \
+  }
+
+#define ARK_SCHEDULE_METHOD_METADATA(name, argc)      \
+  {                                                   \
+#name, { argc, ARK_SCHEDULE_METHOD_CALLER(name) } \
   }
 
 namespace rnoh {

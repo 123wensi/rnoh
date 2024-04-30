@@ -341,14 +341,15 @@ void RNInstanceCAPI::updateSurfaceConstraints(
     float height,
     float viewportOffsetX,
     float viewportOffsetY,
-    float pixelRatio) {
+    float pixelRatio,
+    bool isRTL) {
   DLOG(INFO) << "RNInstanceCAPI::updateSurfaceConstraints";
   auto it = m_surfaceById.find(surfaceId);
   if (it == m_surfaceById.end()) {
     return;
   }
   it->second.updateConstraints(
-      width, height, viewportOffsetX, viewportOffsetY, pixelRatio);
+      width, height, viewportOffsetX, viewportOffsetY, pixelRatio, isRTL);
 }
 
 void RNInstanceCAPI::startSurface(
@@ -358,6 +359,7 @@ void RNInstanceCAPI::startSurface(
     float viewportOffsetX,
     float viewportOffsetY,
     float pixelRatio,
+    bool isRTL,
     folly::dynamic&& initialProps) {
   DLOG(INFO) << "RNInstanceCAPI::startSurface";
   auto it = m_surfaceById.find(surfaceId);
@@ -370,6 +372,7 @@ void RNInstanceCAPI::startSurface(
       viewportOffsetX,
       viewportOffsetY,
       pixelRatio,
+      isRTL,
       std::move(initialProps),
       m_animationDriver);
 }

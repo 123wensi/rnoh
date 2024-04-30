@@ -178,6 +178,7 @@ void RNInstanceArkTS::startSurface(
     float viewportOffsetX,
     float viewportOffsetY,
     float pixelRatio,
+    bool isRTL,
     folly::dynamic&& initialProps) {
   taskExecutor->runTask(TaskThread::JS, [=] {
     try {
@@ -278,7 +279,8 @@ void RNInstanceArkTS::updateSurfaceConstraints(
     float height,
     float viewportOffsetX,
     float viewportOffsetY,
-    float pixelRatio) {
+    float pixelRatio,
+    bool isRTL) {
   taskExecutor->runTask(
       TaskThread::JS,
       [this,
@@ -287,7 +289,8 @@ void RNInstanceArkTS::updateSurfaceConstraints(
        height,
        viewportOffsetX,
        viewportOffsetY,
-       pixelRatio]() {
+       pixelRatio,
+       isRTL]() {
         try {
           if (surfaceHandlers.count(surfaceId) == 0) {
             LOG(ERROR) << "updateSurfaceConstraints: No surface with id "
@@ -301,6 +304,7 @@ void RNInstanceArkTS::updateSurfaceConstraints(
           auto layoutContext = surfaceHandlers[surfaceId]->getLayoutContext();
           layoutContext.viewportOffset = {viewportOffsetX, viewportOffsetY};
           layoutContext.pointScaleFactor = pixelRatio;
+
           surfaceHandlers[surfaceId]->constraintLayout(
               layoutConstraints, layoutContext);
         } catch (const std::exception& e) {

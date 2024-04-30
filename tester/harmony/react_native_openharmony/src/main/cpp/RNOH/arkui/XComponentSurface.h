@@ -35,13 +35,15 @@ class XComponentSurface {
       float height,
       float viewportOffsetX,
       float viewportOffsetY,
-      float pixelRatio);
+      float pixelRatio,
+      bool isRTL);
   void start(
       float width,
       float height,
       float viewportOffsetX,
       float viewportOffsetY,
       float pixelRatio,
+      bool isRTL,
       folly::dynamic const& initialProps,
       std::shared_ptr<facebook::react::LayoutAnimationDriver> const&
           animationDriver);

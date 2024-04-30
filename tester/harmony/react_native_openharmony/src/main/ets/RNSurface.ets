@@ -16,6 +16,7 @@ import {
 } from './RNOHCorePackage/components/RNViewBase';
 import { TouchDispatcher } from './RNOH/TouchDispatcher';
 import { SurfaceHandle, SurfaceProps } from './RNOH/SurfaceHandle';
+import { I18nManagerTurboModule } from './RNOHCorePackage/turboModules';
 
 interface RootViewState {}
 
@@ -114,6 +115,8 @@ export struct RNSurface {
   }
 
   updateSurfaceConstraints() {
+    let isRTL = this.ctx.rnInstance.getTurboModule<I18nManagerTurboModule>('I18nManager').getConstants().isRTL;
+
     if (this.shouldStartSurface) {
       this.surfaceHandle.setDisplayMode(DisplayMode.Visible)
       this.surfaceHandle.start(
@@ -122,7 +125,8 @@ export struct RNSurface {
           height: this.surfaceHeight,
           surfaceOffsetX: this.surfaceOffsetX,
           surfaceOffsetY: this.surfaceOffsetY,
-          pixelRatio: vp2px(1)
+          pixelRatio: vp2px(1),
+          isRTL,
         },
         this.initialProps)
       this.shouldStartSurface = false
@@ -133,6 +137,7 @@ export struct RNSurface {
         surfaceOffsetX: this.surfaceOffsetX,
         surfaceOffsetY: this.surfaceOffsetY,
         pixelRatio: vp2px(1),
+        isRTL,
       });
     }
   }

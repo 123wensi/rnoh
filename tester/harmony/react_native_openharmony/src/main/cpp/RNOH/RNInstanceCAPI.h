@@ -124,7 +124,8 @@ class RNInstanceCAPI : public RNInstanceInternal,
       float height,
       float viewportOffsetX,
       float viewportOffsetY,
-      float pixelRatio) override;
+      float pixelRatio,
+      bool isRTL) override;
   void startSurface(
       facebook::react::Tag surfaceId,
       float width,
@@ -132,6 +133,7 @@ class RNInstanceCAPI : public RNInstanceInternal,
       float viewportOffsetX,
       float viewportOffsetY,
       float pixelRatio,
+      bool isRTL,
       folly::dynamic&& initialProps) override;
   void setSurfaceProps(facebook::react::Tag surfaceId, folly::dynamic&& props)
       override;

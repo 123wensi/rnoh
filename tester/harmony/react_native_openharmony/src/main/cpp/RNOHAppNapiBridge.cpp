@@ -236,7 +236,7 @@ static napi_value updateSurfaceConstraints(
   DLOG(INFO) << "updateSurfaceConstraints\n";
   ArkJS arkJs(env);
   try {
-    auto args = arkJs.getCallbackArgs(info, 7);
+    auto args = arkJs.getCallbackArgs(info, 8);
     size_t instanceId = arkJs.getDouble(args[0]);
     auto lock = std::lock_guard<std::mutex>(rnInstanceByIdMutex);
     auto it = rnInstanceById.find(instanceId);
@@ -250,7 +250,8 @@ static napi_value updateSurfaceConstraints(
         arkJs.getDouble(args[3]),
         arkJs.getDouble(args[4]),
         arkJs.getDouble(args[5]),
-        arkJs.getDouble(args[6]));
+        arkJs.getDouble(args[6]),
+        arkJs.getBoolean(args[7]));
   } catch (...) {
     ArkTSBridge::getInstance()->handleError(std::current_exception());
   }
@@ -282,7 +283,7 @@ static napi_value createSurface(napi_env env, napi_callback_info info) {
 static napi_value startSurface(napi_env env, napi_callback_info info) {
   ArkJS arkJs(env);
   try {
-    auto args = arkJs.getCallbackArgs(info, 8);
+    auto args = arkJs.getCallbackArgs(info, 9);
     size_t instanceId = arkJs.getDouble(args[0]);
     auto lock = std::lock_guard<std::mutex>(rnInstanceByIdMutex);
     auto it = rnInstanceById.find(instanceId);
@@ -299,7 +300,8 @@ static napi_value startSurface(napi_env env, napi_callback_info info) {
         arkJs.getDouble(args[4]),
         arkJs.getDouble(args[5]),
         arkJs.getDouble(args[6]),
-        arkJs.getDynamic(args[7]));
+        arkJs.getBoolean(args[7]),
+        arkJs.getDynamic(args[8]));
   } catch (...) {
     ArkTSBridge::getInstance()->handleError(std::current_exception());
   }

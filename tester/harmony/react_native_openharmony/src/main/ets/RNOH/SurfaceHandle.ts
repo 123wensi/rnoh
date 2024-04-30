@@ -11,6 +11,7 @@ export class SurfaceHandle {
   private props: SurfaceProps
   private startingPromise: Promise<unknown> | undefined = undefined
   private running: boolean = false
+  private surfaceCtx: SurfaceContext = null;
 
   constructor(
     private rnInstance: RNInstance,
@@ -33,6 +34,8 @@ export class SurfaceHandle {
     if (this.destroyed) {
       throw new Error("start called on a destroyed surface");
     }
+
+    this.surfaceCtx = ctx;
     this.props = { ...this.defaultProps, ...props };
     this.napiBridge.startSurface(
       this.rnInstance.getId(),
@@ -42,6 +45,7 @@ export class SurfaceHandle {
       ctx.surfaceOffsetX,
       ctx.surfaceOffsetY,
       ctx.pixelRatio,
+      ctx.isRTL,
       this.props);
     this.running = true
   }
@@ -60,12 +64,22 @@ export class SurfaceHandle {
       height,
       surfaceOffsetX,
       surfaceOffsetY,
-      pixelRatio
+      pixelRatio,
+      isRTL,
     }: SurfaceContext
   ) {
     if (this.destroyed) {
       throw new Error("updateConstraints called on a destroyed surface");
     }
+    this.surfaceCtx = {
+      width,
+      height,
+      surfaceOffsetX,
+      surfaceOffsetY,
+      isRTL,
+      pixelRatio
+    };
+
     this.napiBridge.updateSurfaceConstraints(
       this.rnInstance.getId(),
       this.tag,
@@ -73,7 +87,38 @@ export class SurfaceHandle {
       height,
       surfaceOffsetX,
       surfaceOffsetY,
+      pixelRatio,
+      isRTL,
+    );
+  }
+
+  public updateRTL(isRTL: boolean) {
+    const {
+      width,
+      height,
+      surfaceOffsetX,
+      surfaceOffsetY,
+      pixelRatio,
+    } = this.surfaceCtx;
+
+    this.surfaceCtx = {
+      width,
+      height,
+      surfaceOffsetX,
+      surfaceOffsetY,
+      isRTL,
       pixelRatio
+    };
+
+    this.napiBridge.updateSurfaceConstraints(
+      this.rnInstance.getId(),
+      this.tag,
+      width,
+      height,
+      surfaceOffsetX,
+      surfaceOffsetY,
+      pixelRatio,
+      isRTL,
     );
   }
 

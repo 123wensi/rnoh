@@ -28,6 +28,7 @@ export type SurfaceContext = {
   surfaceOffsetX: number
   surfaceOffsetY: number
   pixelRatio: number
+  isRTL: boolean
 }
 
 export enum LifecycleState {
@@ -119,6 +120,8 @@ export interface RNInstance {
   getTurboModule<T extends TurboModule>(name: string): T;
 
   createSurface(appKey: string): SurfaceHandle;
+
+  updateRTL(isRTL: boolean): void;
 
   updateState(componentName: string, tag: Tag, state: unknown): void;
 
@@ -499,6 +502,12 @@ export class RNInstanceImpl implements RNInstance {
     this.surfaceHandles.add(result)
     stopTracing()
     return result
+  }
+
+  public updateRTL(isRTL: boolean): void {
+    this.surfaceHandles.forEach((SurfaceHandle) => {
+      SurfaceHandle.updateRTL(isRTL);
+    })
   }
 
   public updateState(componentName: string, tag: Tag, state: unknown): void {

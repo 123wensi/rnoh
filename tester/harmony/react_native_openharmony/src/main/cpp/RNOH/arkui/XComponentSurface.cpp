@@ -152,10 +152,12 @@ void XComponentSurface::updateConstraints(
     float height,
     float viewportOffsetX,
     float viewportOffsetY,
-    float pixelRatio) {
+    float pixelRatio,
+    bool isRTL) {
   auto layoutConstraints = m_surfaceHandler.getLayoutConstraints();
-  layoutConstraints.layoutDirection =
-      facebook::react::LayoutDirection::LeftToRight;
+  layoutConstraints.layoutDirection = isRTL
+      ? facebook::react::LayoutDirection::RightToLeft
+      : facebook::react::LayoutDirection::LeftToRight;
   layoutConstraints.minimumSize =
       layoutConstraints.maximumSize = {.width = width, .height = height};
   auto layoutContext = m_surfaceHandler.getLayoutContext();
@@ -170,12 +172,13 @@ void XComponentSurface::start(
     float viewportOffsetX,
     float viewportOffsetY,
     float pixelRatio,
+    bool isRTL,
     folly::dynamic const& initialProps,
     std::shared_ptr<facebook::react::LayoutAnimationDriver> const&
         animationDriver) {
   this->setProps(initialProps);
   this->updateConstraints(
-      width, height, viewportOffsetX, viewportOffsetY, pixelRatio);
+      width, height, viewportOffsetX, viewportOffsetY, pixelRatio, isRTL);
   m_surfaceHandler.start();
   auto mountingCoordinator = m_surfaceHandler.getMountingCoordinator();
   mountingCoordinator->setMountingOverrideDelegate(animationDriver);

@@ -109,6 +109,7 @@ export class NapiBridge {
     surfaceOffsetX: number,
     surfaceOffsetY: number,
     pixelRatio: number,
+    isRTL: boolean,
     initialProps: any) {
     this.libRNOHApp?.startSurface(
       instanceId,
@@ -118,6 +119,7 @@ export class NapiBridge {
       surfaceOffsetX,
       surfaceOffsetY,
       pixelRatio,
+      isRTL,
       initialProps,
     );
   }
@@ -130,6 +132,7 @@ export class NapiBridge {
     surfaceOffsetX: number,
     surfaceOffsetY: number,
     pixelRatio: number,
+    isRTL: boolean,
   ) {
     this.libRNOHApp?.updateSurfaceConstraints(
       instanceId,
@@ -138,7 +141,8 @@ export class NapiBridge {
       surfaceHeight,
       surfaceOffsetX,
       surfaceOffsetY,
-      pixelRatio
+      pixelRatio,
+      isRTL
     );
   }
 
