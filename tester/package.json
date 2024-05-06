@@ -8,7 +8,7 @@
     "postinstall": "node ./scripts/create-build-profile && npm run reinstall:react_native_harmony && npm run reinstall:react_native_harmony_sample_package",
     "reinstall:react_native_harmony": "npm uninstall react-native-harmony && npm run pack_react_native_harmony && npm run install:react_native_harmony",
     "reinstall:react_native_harmony_sample_package": "npm uninstall react-native-harmony-sample-package && npm run pack_react_native_harmony_sample_package && npm run install:react_native_harmony_sample_package",
-    "install:react_native_harmony": "npm i react-native-harmony@file:../react-native-harmony/rnoh-react-native-harmony-0.72.24.tgz",
+    "install:react_native_harmony": "npm i react-native-harmony@file:../react-native-harmony/rnoh-react-native-harmony-0.72.25.tgz",
     "install:react_native_harmony_sample_package": "npm i ../react-native-harmony-sample-package/react-native-harmony-sample-package-1.0.0.tgz",
     "pack_react_native_harmony": "cd ../react-native-harmony && npm pack && cd ../tester",
     "pack_react_native_harmony_sample_package": "cd ../react-native-harmony-sample-package && npm pack && cd ../tester",
@@ -44,7 +44,7 @@
     "react": "18.2.0",
     "react-native": "0.72.5",
     "react-native-flipper-performance-plugin": "^0.4.0",
-    "react-native-harmony": "file:../react-native-harmony/rnoh-react-native-harmony-0.72.24.tgz",
+    "react-native-harmony": "file:../react-native-harmony/rnoh-react-native-harmony-0.72.25.tgz",
     "react-native-harmony-sample-package": "file:../react-native-harmony-sample-package/react-native-harmony-sample-package-1.0.0.tgz"
   },
   "devDependencies": {

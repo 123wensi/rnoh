@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.72.25
+ - [breaking] changed signature of `RNOHCoreContext.createAndRegisterRNInstance` ([a52a79cfee](https://gl.swmansion.com/rnoh/react-native-harmony/-/commit/a52a79cfee2394977d431d064f136f9b3c3dbde1))
+- added support for `ScrollView::maintainVisibleContentPosition` ([c51f235c57](https://gl.swmansion.com/rnoh/react-native-harmony/-/commit/c51f235c577abd5ebf6abe48e173eb493dc14c31))
+- added support for setting `FrameNodeFactory` on an existing `RNInstance` ([a52a79cfee](https://gl.swmansion.com/rnoh/react-native-harmony/-/commit/a52a79cfee2394977d431d064f136f9b3c3dbde1))
+- added allowRTl ([3b2eaede1f](https://gl.swmansion.com/rnoh/react-native-harmony/-/commit/3b2eaede1f3350507d0c61a7576c5c196692444d))
+- added forceRTL ([3b2eaede1f](https://gl.swmansion.com/rnoh/react-native-harmony/-/commit/3b2eaede1f3350507d0c61a7576c5c196692444d))
+- added getConstants ([3b2eaede1f](https://gl.swmansion.com/rnoh/react-native-harmony/-/commit/3b2eaede1f3350507d0c61a7576c5c196692444d))
+- moved initializing `FrameNodeFactory` to `RNSurface` (application code should not create its own `FrameNodeFactory` instances) ([a52a79cfee](https://gl.swmansion.com/rnoh/react-native-harmony/-/commit/a52a79cfee2394977d431d064f136f9b3c3dbde1))
+- improved error handling when no FrameNode is provided ([a52a79cfee](https://gl.swmansion.com/rnoh/react-native-harmony/-/commit/a52a79cfee2394977d431d064f136f9b3c3dbde1))
+
+
 ## v0.72.24
 - added: setHeight/setWidth/setTranslate/setMargin/setPadding/setVisibility in ArkUINode ([7bb94f9db7](https://gl.swmansion.com/rnoh/react-native-harmony/-/commit/7bb94f9db76ff3bedc6be78b79cccacfaed708b4))
 - added support for `RefreshControl::enabled` ([4bbecc3810](https://gl.swmansion.com/rnoh/react-native-harmony/-/commit/4bbecc38105f2e7898f95d4f77483e8d52bdc721))
