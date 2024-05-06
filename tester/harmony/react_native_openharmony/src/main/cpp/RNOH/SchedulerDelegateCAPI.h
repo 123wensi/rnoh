@@ -70,6 +70,7 @@ class SchedulerDelegateCAPI : public facebook::react::SchedulerDelegate {
                            << " failed: " << e.what();
               }
             }
+            finalizeMutationUpdates(mutations);
           });
         });
   }
@@ -125,7 +126,6 @@ class SchedulerDelegateCAPI : public facebook::react::SchedulerDelegate {
     componentInstance->setEventEmitter(shadowView.eventEmitter);
     componentInstance->setState(shadowView.state);
     componentInstance->setProps(shadowView.props);
-    componentInstance->finalizeUpdates();
   }
 
   void handleMutation(facebook::react::ShadowViewMutation mutation) {
@@ -184,8 +184,6 @@ class SchedulerDelegateCAPI : public facebook::react::SchedulerDelegate {
             newChildComponentInstance != nullptr) {
           parentComponentInstance->insertChild(
               newChildComponentInstance, mutation.index);
-          parentComponentInstance->finalizeUpdates();
-          newChildComponentInstance->finalizeUpdates();
         }
         break;
       }
@@ -196,7 +194,6 @@ class SchedulerDelegateCAPI : public facebook::react::SchedulerDelegate {
           parentComponentInstance->removeChild(
               m_componentInstanceRegistry->findByTag(
                   mutation.oldChildShadowView.tag));
-          parentComponentInstance->finalizeUpdates();
         }
 
         auto newChildComponentInstance = m_componentInstanceRegistry->findByTag(
@@ -220,6 +217,9 @@ class SchedulerDelegateCAPI : public facebook::react::SchedulerDelegate {
       }
     }
   }
+
+  void finalizeMutationUpdates(
+      facebook::react::ShadowViewMutationList const& mutations);
 
   std::string getMutationNameFromType(
       facebook::react::ShadowViewMutation::Type mutationType) {

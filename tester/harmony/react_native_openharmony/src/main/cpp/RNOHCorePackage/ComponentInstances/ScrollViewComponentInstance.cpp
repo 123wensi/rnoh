@@ -354,6 +354,12 @@ void ScrollViewComponentInstance::finalizeUpdates() {
   if (parent && !isRefresh) {
     this->getLocalRootArkUINode().setPosition(m_layoutMetrics.frame.origin);
   }
+  if (m_props && m_props->maintainVisibleContentPosition.has_value()) {
+    adjustVisibleContentPosition(
+        m_props->maintainVisibleContentPosition.value());
+    m_firstVisibleView = getFirstVisibleView(
+        m_props->maintainVisibleContentPosition.value().minIndexForVisible);
+  }
 }
 
 folly::dynamic ScrollViewComponentInstance::getScrollEventPayload(
@@ -488,6 +494,92 @@ facebook::react::Point ScrollViewComponentInstance::getContentViewOffset()
     }
   }
   return contentViewOffset;
+}
+
+void ScrollViewComponentInstance::adjustVisibleContentPosition(
+    facebook::react::ScrollViewMaintainVisibleContentPosition const&
+        scrollViewMaintainVisibleContentPosition) {
+  if (!m_firstVisibleView.has_value() || m_children.empty() ||
+      m_children[0] == nullptr) {
+    return;
+  }
+
+  auto firstVisibleView = m_firstVisibleView.value();
+  ComponentInstance::Shared firstVisibleChild = nullptr;
+  for (const auto& child : m_children[0]->getChildren()) {
+    auto childComponentInstance =
+        std::static_pointer_cast<ComponentInstance>(child);
+    if (childComponentInstance->getTag() == firstVisibleView.tag) {
+      firstVisibleChild = childComponentInstance;
+      break;
+    }
+  }
+  if (firstVisibleChild == nullptr) {
+    return;
+  }
+  auto newPosition = firstVisibleChild->getLayoutMetrics().frame.origin;
+
+  if (isHorizontal(m_props)) {
+    auto deltaX = newPosition.x - firstVisibleView.offset;
+    if (deltaX != 0) {
+      auto scrollX = m_currentOffset.x;
+      m_scrollNode.scrollTo(scrollX + deltaX, m_currentOffset.y, false);
+
+      if (scrollViewMaintainVisibleContentPosition.autoscrollToTopThreshold
+              .has_value() &&
+          scrollX <= scrollViewMaintainVisibleContentPosition
+                         .autoscrollToTopThreshold.value()) {
+        m_scrollNode.scrollTo(0, m_currentOffset.y, true);
+      }
+    }
+  } else {
+    auto deltaY = newPosition.y - firstVisibleView.offset;
+    if (deltaY != 0) {
+      auto scrollY = m_currentOffset.y;
+      m_scrollNode.scrollTo(m_currentOffset.x, scrollY + deltaY, false);
+
+      if (scrollViewMaintainVisibleContentPosition.autoscrollToTopThreshold
+              .has_value() &&
+          scrollY <= scrollViewMaintainVisibleContentPosition
+                         .autoscrollToTopThreshold.value()) {
+        m_scrollNode.scrollTo(m_currentOffset.x, 0, true);
+      }
+    }
+  }
+}
+
+std::optional<ScrollViewComponentInstance::ChildTagWithOffset>
+ScrollViewComponentInstance::getFirstVisibleView(int32_t minIndexForVisible) {
+  if (!m_props || m_children.empty() || m_children[0] == nullptr) {
+    return std::nullopt;
+  }
+
+  auto currentScrollPosition =
+      isHorizontal(m_props) ? m_currentOffset.x : m_currentOffset.y;
+  auto const& scrollViewChildren = m_children[0]->getChildren();
+
+  minIndexForVisible = std::max(minIndexForVisible, 0);
+  for (auto it = scrollViewChildren.begin() + minIndexForVisible;
+       it < scrollViewChildren.end();
+       it++) {
+    auto childComponentInstance =
+        std::static_pointer_cast<ComponentInstance>(*it);
+    auto position = isHorizontal(m_props)
+        ? childComponentInstance->getLayoutMetrics().frame.origin.x
+        : childComponentInstance->getLayoutMetrics().frame.origin.y;
+    if (position >= currentScrollPosition) {
+      return std::optional<ScrollViewComponentInstance::ChildTagWithOffset>(
+          {childComponentInstance->getTag(), position});
+    }
+  }
+
+  auto lastChild =
+      std::static_pointer_cast<ComponentInstance>(scrollViewChildren.back());
+  auto position = isHorizontal(m_props)
+      ? lastChild->getLayoutMetrics().frame.origin.x
+      : lastChild->getLayoutMetrics().frame.origin.y;
+  return std::optional<ScrollViewComponentInstance::ChildTagWithOffset>(
+      {lastChild->getTag(), position});
 }
 
 } // namespace rnoh

@@ -69,4 +69,44 @@ void SchedulerDelegateCAPI::synchronouslyUpdateViewOnUIThread(
   componentInstance->setIgnoredPropKeys(std::move(propKeys));
 }
 
+void SchedulerDelegateCAPI::finalizeMutationUpdates(
+    facebook::react::ShadowViewMutationList const& mutations) {
+  std::unordered_set<ComponentInstance::Shared> componentInstancesToFinalize;
+
+  for (const auto& mutation : mutations) {
+    std::shared_ptr<ComponentInstance> componentInstance = nullptr;
+    switch (mutation.type) {
+      case facebook::react::ShadowViewMutation::Create: {
+        componentInstance = m_componentInstanceRegistry->findByTag(
+            mutation.newChildShadowView.tag);
+        break;
+      }
+      case facebook::react::ShadowViewMutation::Delete: {
+        break;
+      }
+      case facebook::react::ShadowViewMutation::Insert: {
+        componentInstance = m_componentInstanceRegistry->findByTag(
+            mutation.parentShadowView.tag);
+        break;
+      }
+      case facebook::react::ShadowViewMutation::Remove: {
+        componentInstance = m_componentInstanceRegistry->findByTag(
+            mutation.parentShadowView.tag);
+        break;
+      }
+      case facebook::react::ShadowViewMutation::Update: {
+        componentInstance = m_componentInstanceRegistry->findByTag(
+            mutation.newChildShadowView.tag);
+        break;
+      }
+    }
+    if (componentInstance != nullptr) {
+      componentInstancesToFinalize.insert(componentInstance);
+    }
+  }
+  for (const auto& componentInstance : componentInstancesToFinalize) {
+    componentInstance->finalizeUpdates();
+  }
+}
+
 } // namespace rnoh
