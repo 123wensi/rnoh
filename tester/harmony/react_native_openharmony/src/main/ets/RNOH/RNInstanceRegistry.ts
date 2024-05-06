@@ -1,5 +1,5 @@
 import type { RNInstance, RNInstanceOptions } from './RNInstance';
-import { RNInstanceImpl, FrameNodeFactory } from './RNInstance';
+import { RNInstanceImpl } from './RNInstance';
 import type { NapiBridge } from './NapiBridge';
 import type { RNOHContext } from './RNOHContext';
 import type { RNOHLogger } from './RNOHLogger';
@@ -20,13 +20,11 @@ export class RNInstanceRegistry {
 
   public async createInstance(
     options: RNInstanceOptions,
-    frameNodeFactory?: FrameNodeFactory,
   ): Promise<RNInstance> {
     const id = this.napiBridge.getNextRNInstanceId();
     const instance = new RNInstanceImpl(
       id,
       this.logger,
-      frameNodeFactory ?? null,
       this.napiBridge,
       this.getDefaultProps(),
       this.devToolsController,

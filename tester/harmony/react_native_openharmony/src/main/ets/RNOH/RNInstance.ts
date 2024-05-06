@@ -147,6 +147,8 @@ export interface RNInstance {
   getAssetsDest(): string
 
   postMessageToCpp(name: string, payload: any): void
+
+  setFrameNodeFactory(frameNodeFactory: FrameNodeFactory | null): void
 }
 
 export type RNInstanceOptions = {
@@ -185,6 +187,7 @@ export class RNInstanceImpl implements RNInstance {
   private responderLockDispatcher: ResponderLockDispatcher
   private isFeatureFlagEnabledByName = new Map<FeatureFlagName, boolean>()
   private initialBundleUrl: string | undefined = undefined
+  private frameNodeFactoryRef: { frameNodeFactory: FrameNodeFactory | null } = { frameNodeFactory: null };
 
   /**
    * @deprecated
@@ -196,7 +199,6 @@ export class RNInstanceImpl implements RNInstance {
   constructor(
     private id: number,
     private injectedLogger: RNOHLogger,
-    private frameNodeFactory: FrameNodeFactory | null,
     private napiBridge: NapiBridge,
     private defaultProps: Record<string, any>,
     private devToolsController: DevToolsController,
@@ -211,6 +213,7 @@ export class RNInstanceImpl implements RNInstance {
   ) {
     this.httpClient = httpClientProvider.getInstance(this)
     this.logger = injectedLogger.clone("RNInstance")
+    this.frameNodeFactoryRef = { frameNodeFactory: null }
     if (this.shouldUseNDKToMeasureText) {
       this.enableFeatureFlag("NDK_TEXT_MEASUREMENTS")
     }
@@ -287,16 +290,10 @@ export class RNInstanceImpl implements RNInstance {
     if (this.shouldUseNDKToMeasureText) {
       cppFeatureFlags.push("ENABLE_NDK_TEXT_MEASURING")
     }
-    if (this.shouldUseCApiArchitecture && !this.frameNodeFactory) {
-      throw new RNOHError({
-        whatHappened: "frameNodeFactory is undefined, but it is required when C-API architecture is enabled",
-        howCanItBeFixed: []
-      })
-    }
     this.napiBridge.createReactNativeInstance(
       this.id,
       this.turboModuleProvider,
-      this.frameNodeFactory,
+      this.frameNodeFactoryRef,
       (mutations) => {
         try {
           this.descriptorRegistry.applyMutations(mutations)
@@ -585,6 +582,10 @@ export class RNInstanceImpl implements RNInstance {
 
   public postMessageToCpp(name: string, payload: any): void {
     this.napiBridge.postMessageToCpp(name, { rnInstanceId: this.id, payload });
+  }
+
+  public setFrameNodeFactory(frameNodeFactory: FrameNodeFactory | null) {
+    this.frameNodeFactoryRef.frameNodeFactory = frameNodeFactory
   }
 }
 

@@ -4,7 +4,7 @@ import { RNOHLogger } from './RNOHLogger'
 import { SafeAreaInsetsProvider } from './SafeAreaInsetsProvider'
 import { DisplayMetrics } from './types'
 import { RNInstanceRegistry } from "./RNInstanceRegistry"
-import { RNInstance, RNInstanceOptions, RNInstanceImpl, FrameNodeFactory } from "./RNInstance"
+import { RNInstance, RNInstanceOptions, RNInstanceImpl } from "./RNInstance"
 import common from '@ohos.app.ability.common'
 import { RNOHError } from "./RNOHError"
 
@@ -26,11 +26,10 @@ export class RNOHCoreContext {
     const safeAreaInsetsProvider = new SafeAreaInsetsProvider(uiAbilityContext);
     const devToolsController_ = devToolsController ?? new DevToolsController(logger)
     return new RNOHCoreContext(
-      async (options, frameNodeFactory) => {
+      async (options) => {
         const stopTracing = logger.clone("createAndRegisterRNInstance").startTracing()
         const result = await rnInstanceRegistry.createInstance(
           options,
-          frameNodeFactory,
         )
         stopTracing()
         return result
@@ -62,7 +61,7 @@ export class RNOHCoreContext {
   }
 
   protected constructor(
-    public createAndRegisterRNInstance: (options: RNInstanceOptions, frameNodeFactory?: FrameNodeFactory) => Promise<RNInstance>,
+    public createAndRegisterRNInstance: (options: RNInstanceOptions) => Promise<RNInstance>,
     public destroyAndUnregisterRNInstance: (rnInstance: RNInstance) => void,
     public logger: RNOHLogger,
     public getDisplayMetrics: () => DisplayMetrics,

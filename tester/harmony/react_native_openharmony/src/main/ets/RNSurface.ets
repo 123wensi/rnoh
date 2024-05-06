@@ -1,6 +1,7 @@
 import { RNComponentFactory, RNView } from './RNOHCorePackage';
 import {
   ComponentBuilderContext,
+  CustomRNComponentFrameNodeFactory,
   Descriptor,
   DisplayMode,
   RNComponentContext,
@@ -64,6 +65,10 @@ export struct RNSurface {
       }))
     }
     const stopTracing = this.logger.clone("aboutToAppear").startTracing()
+    this.ctx.rnInstance.setFrameNodeFactory(new CustomRNComponentFrameNodeFactory(this.getUIContext(), this.ctx.logger,
+      () => {
+        return this.ctx as RNComponentContext
+      }))
     if (Object.keys(this.surfaceConfig).includes("surfaceHandle")) {
       this.surfaceHandle = (this.surfaceConfig as SurfaceConfig1).surfaceHandle;
       this.surfaceHandle.setDisplayMode(DisplayMode.Visible);
@@ -115,7 +120,8 @@ export struct RNSurface {
   }
 
   updateSurfaceConstraints() {
-    let isRTL = this.ctx.rnInstance.getTurboModule<I18nManagerTurboModule>('I18nManager').getConstants().isRTL;
+    let isRTL = this.ctx.rnInstance.getTurboModule<I18nManagerTurboModule>('I18nManager').getConstants()
+      .isRTL;
 
     if (this.shouldStartSurface) {
       this.surfaceHandle.setDisplayMode(DisplayMode.Visible)

@@ -53,7 +53,7 @@ export struct RNApp {
    * Builds a custom fabric component.
    * @deprecated: use wrappedCustomRNComponentBuilder instead
    */
-  @BuilderParam public buildCustomComponent!: CustomComponentBuilder
+  @BuilderParam public buildCustomComponent: CustomComponentBuilder
   /**
    * Builds custom fabric components.
    */
@@ -112,12 +112,14 @@ export struct RNApp {
             buildCustomComponent: this.buildCustomComponent,
           })
         })
-        this.cleanUpCallbacks.push(this.rnInstance.getTurboModule<LogBoxTurboModule>(LogBoxTurboModule.NAME).eventEmitter.subscribe("SHOW", () => {
-          this.logBoxDialogController.open()
-        }))
-        this.cleanUpCallbacks.push(this.rnInstance.getTurboModule<LogBoxTurboModule>(LogBoxTurboModule.NAME).eventEmitter.subscribe("HIDE", () => {
-          this.logBoxDialogController.close()
-        }))
+        this.cleanUpCallbacks.push(this.rnInstance.getTurboModule<LogBoxTurboModule>(LogBoxTurboModule.NAME).eventEmitter.subscribe("SHOW",
+          () => {
+            this.logBoxDialogController.open()
+          }))
+        this.cleanUpCallbacks.push(this.rnInstance.getTurboModule<LogBoxTurboModule>(LogBoxTurboModule.NAME).eventEmitter.subscribe("HIDE",
+          () => {
+            this.logBoxDialogController.close()
+          }))
         this.cleanUpCallbacks.push(this.ctx.devToolsController.eventEmitter.subscribe("RELOAD", async () => {
           await this.cleanUp()
           this.init()
@@ -130,20 +132,21 @@ export struct RNApp {
           return;
         }
         if (jsBundleExecutionStatus !== "DONE") {
-          this.cleanUpCallbacks.push(this.rnInstance.subscribeToLifecycleEvents("JS_BUNDLE_EXECUTION_FINISH", (args) => {
-            if (args.appKeys.includes(this.appKey)) {
-              this.shouldShow = true
-            }
-          }))
+          this.cleanUpCallbacks.push(this.rnInstance.subscribeToLifecycleEvents("JS_BUNDLE_EXECUTION_FINISH",
+            (args) => {
+              if (args.appKeys.includes(this.appKey)) {
+                this.shouldShow = true
+              }
+            }))
         } else {
           this.shouldShow = true
         }
       })()
       stopTracing()
     } catch (reason) {
-      if (typeof reason === "string")
+      if (typeof reason === "string") {
         this.rnohCoreContext!.logger.error(reason)
-      else if (reason instanceof Error) {
+      } else if (reason instanceof Error) {
         this.rnohCoreContext!.logger.error(reason.message)
       } else {
         this.rnohCoreContext!.logger.error("Fatal exception")
@@ -156,7 +159,7 @@ export struct RNApp {
     const stopTracing = this.logger.clone("cleanUp").startTracing()
     this.shouldShow = false
     if (this.shouldDestroyRNInstance) {
-      await this.rnohCoreContext!.destroyAndUnregisterRNInstance(this.rnInstance)
+      this.rnohCoreContext!.destroyAndUnregisterRNInstance(this.rnInstance)
     }
     this.cleanUpCallbacks.forEach(cleanUp => cleanUp())
     stopTracing()
@@ -168,8 +171,7 @@ export struct RNApp {
     } else {
       const options = this.rnInstanceConfig
       this.shouldDestroyRNInstance = true
-      return this.rnohCoreContext!.createAndRegisterRNInstance(options as RNInstanceOptions,
-        new CustomRNComponentFrameNodeFactory(this.getUIContext(), this.rnohCoreContext!.logger, () => this.ctx))
+      return this.rnohCoreContext!.createAndRegisterRNInstance(options as RNInstanceOptions)
     }
   }
 

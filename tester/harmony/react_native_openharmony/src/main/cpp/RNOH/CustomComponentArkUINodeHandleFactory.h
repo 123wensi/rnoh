@@ -30,21 +30,24 @@ class CustomComponentArkUINodeHandleFactory {
 
   ArkUI_NodeHandle create(facebook::react::Tag tag, std::string componentName) {
 #ifdef C_API_ARCH
-    ArkUI_NodeHandle arkTSNodeHandle;
+    ArkUI_NodeHandle arkTSNodeHandle = nullptr;
     m_taskExecutor->runSyncTask(
         TaskThread::MAIN,
         [=, &arkTSNodeHandle, componentName = std::move(componentName)] {
           ArkJS arkJs(m_env);
-          auto n_result =
+          auto frameNodeFactory =
               arkJs.getObject(m_customRNComponentFrameNodeFactoryRef)
-                  .call(
-                      "create",
-                      {arkJs.createInt(tag),
-                       arkJs.createString(componentName)});
+                  .getProperty("frameNodeFactory");
+          auto n_result = arkJs.getObject(frameNodeFactory)
+                              .call(
+                                  "create",
+                                  {arkJs.createInt(tag),
+                                   arkJs.createString(componentName)});
           auto errorCode = OH_ArkUI_GetNodeHandleFromNapiValue(
               m_env, n_result, &arkTSNodeHandle);
           if (errorCode != 0) {
             LOG(ERROR) << "Couldn't get node handle. Error code: " << errorCode;
+            arkTSNodeHandle = nullptr;
           }
         });
     return arkTSNodeHandle;

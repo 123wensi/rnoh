@@ -47,7 +47,7 @@ export class NapiBridge {
 
   createReactNativeInstance(instanceId: number,
                             turboModuleProvider: TurboModuleProvider,
-                            frameNodeFactory: FrameNodeFactory,
+                            frameNodeFactoryRef: { frameNodeFactory: FrameNodeFactory | null },
                             mutationsListener: (mutations: Mutation[]) => void,
                             componentCommandsListener: (tag: Tag,
                                                         commandName: string,
@@ -81,7 +81,7 @@ export class NapiBridge {
       shouldEnableDebugger,
       shouldEnableBackgroundExecutor,
       cppFeatureFlagStatusByName,
-      frameNodeFactory,
+      frameNodeFactoryRef,
     );
   }
 
