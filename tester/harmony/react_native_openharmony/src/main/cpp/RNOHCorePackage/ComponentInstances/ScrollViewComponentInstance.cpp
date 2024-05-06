@@ -135,6 +135,11 @@ void ScrollViewComponentInstance::handleCommand(
 void rnoh::ScrollViewComponentInstance::onNativeResponderBlockChange(
     bool isBlocked) {
   m_isNativeResponderBlocked = isBlocked;
+  if (isBlocked) {
+    m_scrollNode.setEnableScrollInteraction(false);
+  } else {
+    m_scrollNode.setEnableScrollInteraction(m_props->scrollEnabled);
+  }
 }
 
 facebook::react::Point rnoh::ScrollViewComponentInstance::computeChildPoint(
@@ -226,23 +231,6 @@ float ScrollViewComponentInstance::onScrollFrameBegin(
     int32_t scrollState) {
   m_recentScrollFrameOffset = offset;
   auto newScrollState = static_cast<ScrollState>(scrollState);
-
-  auto isGestureBlocked = m_isNativeResponderBlocked ||
-      // when the JS responder is released, the ScrollView may become unblocked,
-      // but still internally trying to "fling". This checks for that case.
-      (newScrollState == ScrollState::FLING &&
-       m_scrollState == ScrollState::IDLE);
-
-  if (isGestureBlocked) {
-    if (m_scrollState == ScrollState::SCROLL) {
-      emitOnScrollEndDragEvent();
-    } else if (m_scrollState == ScrollState::FLING) {
-      emitOnMomentumScrollEndEvent();
-    }
-    m_scrollState = ScrollState::IDLE;
-    return 0;
-  }
-
   if (m_scrollState != newScrollState) {
     if (m_scrollState == ScrollState::SCROLL) {
       emitOnScrollEndDragEvent();
