@@ -1,7 +1,14 @@
 import React, {useEffect, useState} from 'react';
-import {StyleSheet, StatusBar, Text, View, StatusBarStyle} from 'react-native';
+import {
+  StyleSheet,
+  StatusBar,
+  Text,
+  View,
+  StatusBarStyle,
+  StatusBarProps,
+} from 'react-native';
 import {TestSuite} from '@rnoh/testerino';
-import {TestCase} from '../components';
+import {Button, TestCase} from '../components';
 
 export function StatusBarTest() {
   return (
@@ -20,6 +27,7 @@ function StatusBarView({animated}: {animated?: boolean}) {
     STYLES[0],
   );
   const [translucent, setTranslucent] = useState(false);
+  const [greenProps, setGreenProps] = useState<StatusBarProps>({});
 
   const changeStatusBarStyle = () => {
     const styleId = STYLES.indexOf(statusBarStyle) + 1;
@@ -170,6 +178,25 @@ function StatusBarView({animated}: {animated?: boolean}) {
           expect(StatusBar.currentHeight).to.be.closeTo(38.8, 0.1);
         }}
       />
+      <TestCase.Example
+        tags={['C_API']}
+        itShould="set status bar color to green on push and return to previous style on pop">
+        <Button
+          label="push green"
+          onPress={() => {
+            const res = StatusBar.pushStackEntry({
+              backgroundColor: 'green',
+            });
+            setGreenProps(res);
+          }}
+        />
+        <Button
+          label="pop green"
+          onPress={() => {
+            StatusBar.popStackEntry(greenProps);
+          }}
+        />
+      </TestCase.Example>
     </View>
   );
 }
