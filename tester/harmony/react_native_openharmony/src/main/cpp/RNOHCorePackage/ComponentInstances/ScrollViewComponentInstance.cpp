@@ -420,10 +420,10 @@ bool ScrollViewComponentInstance::isContentSmallerThanContainer() {
 bool ScrollViewComponentInstance::isAtEnd(
     facebook::react::Point currentOffset) {
   if (isHorizontal(m_props)) {
-    return currentOffset.x <= 0 ||
+    return currentOffset.x <= 0.001 ||
         m_contentSize.width - m_containerSize.width - currentOffset.x < 0.001;
   } else {
-    return currentOffset.y <= 0 ||
+    return currentOffset.y <= 0.001 ||
         m_contentSize.height - m_containerSize.height - currentOffset.y < 0.001;
   }
 }
