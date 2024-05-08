@@ -24,6 +24,9 @@ class FakeTurboModulesFactory extends TurboModulesFactory {
   }
 }
 
+/**
+ * Currently empty. This context provides a way to inject dependencies in the future without in non-breaking changes manner.
+ */
 export type RNPackageContext = {};
 export type DescriptorWrapperFactoryByDescriptorTypeCtx = {}
 export type DescriptorWrapperFactoryByDescriptorType = Record<string, DescriptorWrapperFactory>

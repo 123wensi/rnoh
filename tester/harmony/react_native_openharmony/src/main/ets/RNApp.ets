@@ -10,7 +10,6 @@ import {
   RNDevLoadingView,
   RNComponentContext,
   WrappedCustomRNComponentBuilder,
-  CustomRNComponentFrameNodeFactory,
   RNOHCoreContext,
   RNOHContext
 } from './RNOH';
@@ -29,37 +28,41 @@ export function buildRNComponentForTag(ctx: RNComponentContext, tag: Tag) {
   buildRNComponent(ctx, ctx.descriptorRegistry.findDescriptorWrapperByTag(tag)!)
 }
 
+/**
+ * The RNApp component renders a React Native application. It is recommended for use when the application consists of a single
+ * surface. For applications with multiple surfaces, consider using RNSurface instead.
+ */
 @Component
 @Preview
 export struct RNApp {
   /**
-   * RNInstance or RNInstanceOptions used to create RNInstance.
-   * If RNInstanceOptions are provided, this component takes the responsibility for creating and managing RNInstance.
+   * Required. RNInstance or RNInstanceOptions used to create RNInstance.
+   * If RNInstanceOptions is provided, this component takes the responsibility for creating and managing RNInstance.
    */
   public rnInstanceConfig!: RNInstanceConfig
   /**
-   * App name. Check react-native/Libraries/AppRegistry for more info.
+   * Required. App name. Check react-native/Libraries/AppRegistry for more info.
    */
   public appKey: string = ''
   /**
-   * If provided, Runs JS Bundle against rnInstance. Creates surface after bundle has been loaded.
+   * Optional. If provided, runs JS Bundle in the rnInstance. Creates a surface after bundle has been loaded.
    */
   public jsBundleProvider: JSBundleProvider | undefined = undefined
   /**
-   * Initial properties for the main component of the React Native app.
+   * Optional. Initial properties for the main component of the React Native app.
    */
   public initialProps: Record<string, string> = {}
   /**
-   * Builds a custom fabric component.
+   * Required if wrappedCustomRNComponentBuilder is not provided. Builds a custom fabric component.
    * @deprecated: use wrappedCustomRNComponentBuilder instead
    */
   @BuilderParam public buildCustomComponent: CustomComponentBuilder
   /**
-   * Builds custom fabric components.
+   * Required unless buildCustomComponent is still used. Builds custom fabric components.
    */
   public wrappedCustomRNComponentBuilder: WrappedCustomRNComponentBuilder | undefined = undefined
   /**
-   * Called before a surface is visible, and rnInstance is available.
+   * Optional. Called before a surface is visible, and rnInstance is available.
    */
   public onSetUp: (rnInstance: RNInstance) => Promise<void> | void = () => Promise.resolve()
   // -------------------------------------------------------------------------------------------------------------------

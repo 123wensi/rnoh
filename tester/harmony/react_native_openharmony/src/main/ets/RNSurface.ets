@@ -36,18 +36,26 @@ export interface SurfaceConfig2 extends SurfaceConfig {
 
 @Component
 export struct RNSurface {
+  /**
+   * Required.
+   */
   public ctx!: RNOHContext | RNComponentContext;
+  /**
+   * Required
+   */
   public surfaceConfig!: SurfaceConfig;
   /**
+   * Required if ctx isn't RNComponentContext
    * @deprecated: provide RNComponentContext to RNSurface::ctx instead
    */
   @BuilderParam buildCustomComponent: (ctx: ComponentBuilderContext) => void;
-  surfaceWidth: number = 0;
-  surfaceHeight: number = 0;
-  surfaceOffsetX: number = 0;
-  surfaceOffsetY: number = 0;
-  @State descriptor: RootDescriptor = Object() as RootDescriptor;
-  @State descriptorWrapper: ViewDescriptorWrapperBase | undefined = undefined
+  // -------------------------------------------------------------------------------------------------------------------
+  private surfaceWidth: number = 0;
+  private surfaceHeight: number = 0;
+  private surfaceOffsetX: number = 0;
+  private surfaceOffsetY: number = 0;
+  @State private descriptor: RootDescriptor = Object() as RootDescriptor;
+  @State private descriptorWrapper: ViewDescriptorWrapperBase | undefined = undefined
   @State private shouldStartSurface: boolean = false;
   private surfaceHandle!: SurfaceHandle;
   private cleanUpCallbacks: (() => void)[] = [];

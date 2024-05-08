@@ -83,81 +83,189 @@ const DEFAULT_ASSETS_DEST: string = "assets/"; // assets destination path "asset
 
 type FeatureFlagName = "ENABLE_RN_INSTANCE_CLEAN_UP" | "NDK_TEXT_MEASUREMENTS" | "IMAGE_LOADER" | "C_API_ARCH"
 
+/**
+ * Coordinates information flow by passing information to other objects to facilitate their operations.
+ * Each RNInstance has its own JavaScript environment. A single application can utilize multiple RNInstances.
+ */
 export interface RNInstance {
+  /**
+   * Check DescriptorRegistry documentation for more information.
+   */
   descriptorRegistry: DescriptorRegistry;
+  /**
+   * @architecture: C-API
+   * Relays messages emitted from C++ by RNInstanceCAPI::postMessageToArkTS
+   */
   cppEventEmitter: EventEmitter<Record<string, unknown[]>>
   /**
    * @deprecated Use RNOHContext::componentCommandReceiver
    */
   commandDispatcher: CommandDispatcher;
+  /**
+   * Check ComponentManagerRegistry documentation for more information.
+   */
   componentManagerRegistry: ComponentManagerRegistry;
-
+  /**
+   * Mindless copy of Android's `ReactInstanceManager::getLifecycleState` per specific request.
+   * It probably behaves differently to Android because UIAbility is a different concept than Android's Activity despite
+   * certain similarities.
+   */
   getLifecycleState(): LifecycleState;
-
+  /**
+   * Allows subscribing to various events. Check LifecycleEventArgsByEventName type for more information.
+   */
   subscribeToLifecycleEvents: <TEventName extends keyof LifecycleEventArgsByEventName>(
     eventName: TEventName,
     listener: (...args: LifecycleEventArgsByEventName[TEventName]) => void
   ) => () => void;
+  /**
+   * Similar to subscribeToLifecycleEvents but handles different set of events. It may be removed to unify subscribing to events.
+   */
   subscribeToStageChangeEvents: <TEventName extends keyof StageChangeEventArgsByEventName>(
     eventName: TEventName,
     listener: (...args: StageChangeEventArgsByEventName[TEventName]) => void
   ) => () => void;
-
+  /**
+   * Asynchronously executes a JS function. It may be renamed in the future because "call" suggest synchronous communication.
+   * @param moduleName — name of the JavaScript file
+   * @param functionName — name of the function defined in module.exports in that JS file
+   * @param args - args that function should receive
+   */
   callRNFunction(moduleName: string, functionName: string, args: unknown[]): void;
-
+  /**
+   * Sends device events (e.g. "appearanceChanged") to React Native.
+   */
   emitDeviceEvent(eventName: string, payload: any): void;
-
+  /**
+   * Sends component events like "onScroll". That event is received by "EventEmitRequestHandler" on the C++ side. That handler
+   * calls proper method on Component's EventEmitter.
+   */
   emitComponentEvent(tag: Tag, eventName: string, payload: any): void;
-
+  /**
+   * Used by RNApp to avoid loading the same bundle twice.
+   */
   getBundleExecutionStatus(bundleURL: string): BundleExecutionStatus | undefined
-
+  /**
+   * Enables feature flag. It may be removed in the future because usually feature flags need to be provided when creating
+   * RNInstance.
+   */
   enableFeatureFlag(featureFlagName: FeatureFlagName): void
-
+  /**
+   * Checks if given feature flag is enabled.
+   */
   isFeatureFlagEnabled(featureFlagName: FeatureFlagName): boolean
-
+  /**
+   * Reads JS Bundle and executes loaded code.
+   */
   runJSBundle(jsBundleProvider: JSBundleProvider): Promise<void>;
-
+  /**
+   * Provides TurboModule instance. Currently TurboModule live on UI thread. This method may be deprecated once "Worker" turbo module are supported.
+   */
   getTurboModule<T extends TurboModule>(name: string): T;
-
+  /**
+   * Used by RNSurface. It creates a surface somewhere in React Native.
+   */
   createSurface(appKey: string): SurfaceHandle;
-
+  /**
+   * Sets (Right-To-Left) mode in all surfaces.
+   */
   updateRTL(isRTL: boolean): void;
-
+  /**
+   * Sends state update request to ComponentNapiBinder.h::updateState to update the state on C++ side.
+   */
   updateState(componentName: string, tag: Tag, state: unknown): void;
-
+  /**
+   * @returns RNInstance ID.
+   */
   getId(): number;
 
+  /**
+   * This method can be used to replace a core component with a custom one.
+   * @param descriptorType - type of the descriptor
+   * @param componentName - value to be provided in ComponentBuilderContext for given `descriptorType`
+   */
   bindComponentNameToDescriptorType(componentName: string, descriptorType: string);
 
+  /**
+   * Internal method related to bindComponentNameToDescriptorType.
+   */
   getComponentNameFromDescriptorType(descriptorType: string): string
 
   /**
+   * @architecture: ArkTS
    * Blocks gestures in targetComponent and its ancestors. Used by react-native-gesture-handler when panning in
    * RNScrollView or other scrollable components.
    * @returns a function that cancels this this effect
    */
   blockComponentsGestures(targetComponentTag: Tag): (() => void)
-
+  /**
+   * @returns the first loaded JS Bundle URL. This method is used by SourceCodeTurboModule to generate proper stack traces.
+   * Some apps split their bundles to improve the start up performance, hence the word "initial".
+   */
   getInitialBundleUrl(): string | undefined
-
+  /**
+   * @returns current RNOH architecture name
+   */
   getArchitecture(): "ARK_TS" | "C_API"
-
+  /**
+   * (Almost) all network request go through HttpClient which can be used to improve logging or unify request handling
+   * in hybrid (JS+Native) applications.
+   */
   get httpClient(): HttpClient,
 
+  /**
+   * @returns base path specifying where to look for bundled assets
+   */
   getAssetsDest(): string
 
+  /**
+   * @architecture: C-API
+   * Sends message to C++ side. Handled by ArkTSMessageHub::Observer or ArkTSMessageHandler.
+   */
   postMessageToCpp(name: string, payload: any): void
 
+  /**
+   * @architecture: C-API
+   * Internal method.
+   */
   setFrameNodeFactory(frameNodeFactory: FrameNodeFactory | null): void
 }
 
 export type RNInstanceOptions = {
+  /**
+   * Creates RNPackages provided by third-party libraries.
+   */
   createRNPackages: (ctx: RNPackageContext) => RNPackage[],
+  /**
+   * Enables the Hermes debugger. Should be disabled in production environments to avoid performance degradation.
+   */
   enableDebugger?: boolean,
+  /**
+   * UNSTABLE: Enables an additional BACKGROUND thread for layout calculations. This improves performance
+   * but increases the risk of deadlocks.
+   */
   enableBackgroundExecutor?: boolean,
+  /**
+   * @architecture: ArkTS
+   * Enables text measurement using NDK (C++) interface.
+   * The NDK approach is faster and relatively stable, and will become the default in future versions.
+   */
   enableNDKTextMeasuring?: boolean,
+  /**
+   * @architecture: ArkTS
+   * Manages image loading and caching. When enabled, RNOH takes responsibility; when disabled, it delegates to ArkUI's Image component.
+   * Each approach presents issues under different scenarios.
+   */
   enableImageLoader?: boolean,
+  /**
+   * Toggles between the ArkTS (older, more stable but slower) and C-API (newer, less stable but faster) architectures.
+   * Choose based on preference for stability or performance.
+   */
   enableCAPIArchitecture?: boolean,
+  /**
+   * Specifies the path for RN to locate assets. Necessary in production environments where assets are not hosted by the Metro server.
+   * Required if using a custom `--assets-dest` with `react-native bundle-harmony`.
+   */
   assetsDest?: string,
 }
 

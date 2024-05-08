@@ -7,6 +7,9 @@ interface ComponentManagerRegistryEntry {
   refCounter: number,
 }
 
+/**
+ * Stores ComponentManagers. Check ComponentManager documentation for more information.
+ */
 export class ComponentManagerRegistry {
   private componentManagersByTag: Map<Tag, ComponentManager[]>;
   private entryByTag: Map<Tag, ComponentManagerRegistryEntry> = new Map();

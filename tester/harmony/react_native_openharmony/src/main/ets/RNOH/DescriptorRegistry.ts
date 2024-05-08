@@ -32,6 +32,9 @@ export type DescriptorMutation = InsertMutation | UpdateMutation | RemoveMutatio
 
 export type DescriptorMutationListener = (args: DescriptorMutation) => void
 
+/**
+ * Stores (ComponentInstance)Descriptors. Check Descriptor doc comment for more info.
+ */
 export class DescriptorRegistry {
   static readonly ANIMATED_NON_RAW_PROP_KEYS = ['transform'];
 

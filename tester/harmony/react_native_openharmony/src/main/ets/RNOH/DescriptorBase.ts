@@ -62,7 +62,7 @@ export class PropsSelectorBase {
 }
 
 /**
- * (Component)DescriptorWrapper. Decouples "what" is received from React Native from "how".
+ * (ComponentInstance)DescriptorWrapper. Decouples "what" is received from React Native from "how".
  */
 export class DescriptorWrapper<TType = string,
 TProps extends PropsBase = PropsBase,
@@ -183,7 +183,8 @@ export interface DescriptorEssence<TType = string> {
 }
 
 /**
- * (ComponentInstance)Descriptor
+ * (ComponentInstance)Descriptor. Data structure - exposes data and provides no behavior.
+ * If you want to expose a behavior use Component(Instance)Manager instead.
  */
 export interface Descriptor<TType = string,
 TProps extends Object = Object,

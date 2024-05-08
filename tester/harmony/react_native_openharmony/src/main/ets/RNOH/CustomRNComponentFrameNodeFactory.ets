@@ -7,6 +7,9 @@ import { RNComponentContext, ComponentBuilderContext, ComponentBuilderContextImp
 import type { FrameNodeFactory } from "./RNInstance"
 import { RNOHLogger } from "./RNOHLogger"
 
+/**
+ * This is internal class instantiated by RNSurface.
+ */
 export class CustomRNComponentFrameNodeFactory implements FrameNodeFactory {
   private uiCtx: UIContext;
   private getRNComponentContext: () => (RNComponentContext | undefined)

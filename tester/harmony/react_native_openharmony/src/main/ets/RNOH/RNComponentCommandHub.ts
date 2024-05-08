@@ -3,7 +3,7 @@ import type {Tag} from './DescriptorBase';
 export type CommandCallback = (command: string, args: unknown) => void;
 
 /**
- * Part of the public API. Custom fabric components may listen to commands dispatched from RN.
+ * Part of the public native API. Custom fabric components can receive commands dispatched from RN by using this class.
  */
 export class RNComponentCommandReceiver {
   protected commandCallbacks: Map<Tag, CommandCallback[]> = new Map();
