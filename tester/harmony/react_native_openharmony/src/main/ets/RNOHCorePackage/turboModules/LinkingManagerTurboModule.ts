@@ -3,11 +3,12 @@ import call from '@ohos.telephony.call';
 import type { TurboModuleContext } from "../../RNOH/TurboModule";
 import { TurboModule } from "../../RNOH/TurboModule";
 import type Want from '@ohos.app.ability.Want';
+import bundleManager from '@ohos.bundle.bundleManager';
 
 export class LinkingManagerTurboModule extends TurboModule {
   public static readonly NAME = 'LinkingManager' as const;
 
-  private static readonly SUPPORTED_SCHEMES = ["tel", "sms", "http", "https"];
+  private static readonly CUSTOM_HANDLED_SCHEMES = ['tel', 'sms']; // those exceptions are manually handled in openURL because OH doesn't support opening urls with those schemes
 
   private initialUrl: string | undefined;
 
@@ -21,12 +22,20 @@ export class LinkingManagerTurboModule extends TurboModule {
   }
 
   async canOpenURL(urlString: string): Promise<boolean> {
-    // TODO: check if there is an application which can handle the url.
-    // This use case doesn't seem to be supported in OHOS yet?
-    // You can `startAbility` to handle a `want`, but you can't
-    // query if some ability _can_ handle it.
-    const uriObject = new uri.URI(urlString);
-    return LinkingManagerTurboModule.SUPPORTED_SCHEMES.includes(uriObject.scheme);
+    if (
+      LinkingManagerTurboModule.CUSTOM_HANDLED_SCHEMES.includes(
+        new uri.URI(urlString).scheme,
+      )
+    ) {
+      return true;
+    }
+    try {
+      // this will return true for custom schemes only if you enable quering those schemes in the module.json5 file (in the app which tries to make a query)
+      return bundleManager.canOpenLink(urlString);
+    } catch (e) {
+      this.ctx.logger.error(e);
+      return false;
+    }
   }
 
   async openURL(urlString: string): Promise<void> {

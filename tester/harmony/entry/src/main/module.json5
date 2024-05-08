@@ -10,6 +10,8 @@
     "deliveryWithInstall": true,
     "installationFree": false,
     "pages": "$profile:main_pages",
+    // below property is supported from 5.0.0 - it is needed by bundleManager.canOpenLink to check if the app can open some url
+    // "querySchemes": ["maps", "http", "https", "customDomain"],
     "requestPermissions": [
       {
         "name": "ohos.permission.INTERNET"
