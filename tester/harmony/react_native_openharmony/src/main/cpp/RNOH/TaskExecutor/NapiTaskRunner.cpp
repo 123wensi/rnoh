@@ -12,8 +12,9 @@ NapiTaskRunner::NapiTaskRunner(napi_env env, ExceptionHandler exceptionHandler)
   // NOTE: let's hope the JS runtime doesn't move between system threads...
   threadId = std::this_thread::get_id();
   auto loop = getLoop();
-  asyncHandle.data = static_cast<void*>(this);
-  uv_async_init(loop, &asyncHandle, [](auto handle) {
+  asyncHandle = new uv_async_t;
+  asyncHandle->data = static_cast<void*>(this);
+  uv_async_init(loop, asyncHandle, [](auto handle) {
     auto runner = static_cast<NapiTaskRunner*>(handle->data);
 
     // https://nodejs.org/api/n-api.html#napi_handle_scope
@@ -53,13 +54,17 @@ NapiTaskRunner::NapiTaskRunner(napi_env env, ExceptionHandler exceptionHandler)
 NapiTaskRunner::~NapiTaskRunner() {
   running->store(false);
   cv.notify_all();
-  uv_close(reinterpret_cast<uv_handle_t*>(&asyncHandle), nullptr);
+  uv_close(reinterpret_cast<uv_handle_t*>(asyncHandle),
+    [] (uv_handle_t* handle) {
+      delete (uv_async_t*) handle;
+    }
+  );
 }
 
 void NapiTaskRunner::runAsyncTask(Task&& task) {
   std::unique_lock<std::mutex> lock(tasksMutex);
   tasksQueue.push(task);
-  uv_async_send(&asyncHandle);
+  uv_async_send(asyncHandle);
 }
 
 void NapiTaskRunner::runSyncTask(Task&& task) {
@@ -74,7 +79,7 @@ void NapiTaskRunner::runSyncTask(Task&& task) {
     done = true;
     cv.notify_all();
   });
-  uv_async_send(&asyncHandle);
+  uv_async_send(asyncHandle);
   cv.wait(lock, [running = this->running, &done] {
     return !(running->load()) || done.load();
   });

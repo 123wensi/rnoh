@@ -36,7 +36,7 @@ class NapiTaskRunner : public AbstractTaskRunner {
   napi_env env;
   uv_loop_t* getLoop() const;
 
-  uv_async_t asyncHandle;
+  uv_async_t* asyncHandle;
   std::mutex tasksMutex;
   std::queue<Task> tasksQueue;
   std::thread::id threadId;
