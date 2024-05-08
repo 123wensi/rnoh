@@ -339,8 +339,8 @@ void ScrollViewComponentInstance::setScrollSnap(
 }
 bool ScrollViewComponentInstance::scrollMovedBySignificantOffset(
     facebook::react::Point newOffset) {
-  return std::abs(newOffset.x - m_currentOffset.x) >= 1 ||
-      std::abs(newOffset.y - m_currentOffset.y) >= 1;
+  return std::abs(newOffset.x - m_currentOffset.x) >= 0.01 ||
+      std::abs(newOffset.y - m_currentOffset.y) >= 0.01;
 }
 
 void ScrollViewComponentInstance::finalizeUpdates() {
